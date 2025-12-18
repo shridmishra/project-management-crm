@@ -1,6 +1,26 @@
 import { useState } from "react";
 import { XIcon } from "lucide-react";
 import { useSelector } from "react-redux";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
+import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import { Badge } from "@/components/ui/badge"
 
 const CreateProjectDialog = ({ isDialogOpen, setIsDialogOpen }) => {
 
@@ -29,129 +49,182 @@ const CreateProjectDialog = ({ isDialogOpen, setIsDialogOpen }) => {
         setFormData((prev) => ({ ...prev, team_members: prev.team_members.filter(m => m !== email) }));
     };
 
-    if (!isDialogOpen) return null;
-
     return (
-        <div className="fixed inset-0 bg-black/20 dark:bg-black/60 backdrop-blur flex items-center justify-center text-left z-50">
-            <div className="bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl p-6 w-full max-w-lg text-zinc-900 dark:text-zinc-200 relative">
-                <button className="absolute top-3 right-3 text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200" onClick={() => setIsDialogOpen(false)} >
-                    <XIcon className="size-5" />
-                </button>
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+                <DialogHeader>
+                    <DialogTitle>Create New Project</DialogTitle>
+                    <DialogDescription>
+                        {currentWorkspace && (
+                            <span>In workspace: <span className="text-primary font-medium">{currentWorkspace.name}</span></span>
+                        )}
+                    </DialogDescription>
+                </DialogHeader>
 
-                <h2 className="text-xl font-medium mb-1">Create New Project</h2>
-                {currentWorkspace && (
-                    <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-4">
-                        In workspace: <span className="text-blue-600 dark:text-blue-400">{currentWorkspace.name}</span>
-                    </p>
-                )}
-
-                <form onSubmit={handleSubmit} className="space-y-4">
+                <form onSubmit={handleSubmit} className="space-y-4 py-4">
                     {/* Project Name */}
-                    <div>
-                        <label className="block text-sm mb-1">Project Name</label>
-                        <input type="text" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} placeholder="Enter project name" className="w-full px-3 py-2 rounded dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 mt-1 text-zinc-900 dark:text-zinc-200 text-sm" required />
+                    <div className="space-y-2">
+                        <Label htmlFor="name">Project Name</Label>
+                        <Input 
+                            id="name" 
+                            value={formData.name} 
+                            onChange={(e) => setFormData({ ...formData, name: e.target.value })} 
+                            placeholder="Enter project name" 
+                            required 
+                        />
                     </div>
 
                     {/* Description */}
-                    <div>
-                        <label className="block text-sm mb-1">Description</label>
-                        <textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} placeholder="Describe your project" className="w-full px-3 py-2 rounded dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 mt-1 text-zinc-900 dark:text-zinc-200 text-sm h-20" />
+                    <div className="space-y-2">
+                        <Label htmlFor="description">Description</Label>
+                        <Textarea 
+                            id="description" 
+                            value={formData.description} 
+                            onChange={(e) => setFormData({ ...formData, description: e.target.value })} 
+                            placeholder="Describe your project" 
+                            className="h-20"
+                        />
                     </div>
 
                     {/* Status & Priority */}
                     <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <label className="block text-sm mb-1">Status</label>
-                            <select value={formData.status} onChange={(e) => setFormData({ ...formData, status: e.target.value })} className="w-full px-3 py-2 rounded dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 mt-1 text-zinc-900 dark:text-zinc-200 text-sm" >
-                                <option value="PLANNING">Planning</option>
-                                <option value="ACTIVE">Active</option>
-                                <option value="COMPLETED">Completed</option>
-                                <option value="ON_HOLD">On Hold</option>
-                                <option value="CANCELLED">Cancelled</option>
-                            </select>
+                        <div className="space-y-2">
+                            <Label htmlFor="status">Status</Label>
+                            <Select 
+                                value={formData.status} 
+                                onValueChange={(value) => setFormData({ ...formData, status: value })}
+                            >
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select status" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="PLANNING">Planning</SelectItem>
+                                    <SelectItem value="ACTIVE">Active</SelectItem>
+                                    <SelectItem value="COMPLETED">Completed</SelectItem>
+                                    <SelectItem value="ON_HOLD">On Hold</SelectItem>
+                                    <SelectItem value="CANCELLED">Cancelled</SelectItem>
+                                </SelectContent>
+                            </Select>
                         </div>
 
-                        <div>
-                            <label className="block text-sm mb-1">Priority</label>
-                            <select value={formData.priority} onChange={(e) => setFormData({ ...formData, priority: e.target.value })} className="w-full px-3 py-2 rounded dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 mt-1 text-zinc-900 dark:text-zinc-200 text-sm" >
-                                <option value="LOW">Low</option>
-                                <option value="MEDIUM">Medium</option>
-                                <option value="HIGH">High</option>
-                            </select>
+                        <div className="space-y-2">
+                            <Label htmlFor="priority">Priority</Label>
+                            <Select 
+                                value={formData.priority} 
+                                onValueChange={(value) => setFormData({ ...formData, priority: value })}
+                            >
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select priority" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="LOW">Low</SelectItem>
+                                    <SelectItem value="MEDIUM">Medium</SelectItem>
+                                    <SelectItem value="HIGH">High</SelectItem>
+                                </SelectContent>
+                            </Select>
                         </div>
                     </div>
 
                     {/* Dates */}
                     <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <label className="block text-sm mb-1">Start Date</label>
-                            <input type="date" value={formData.start_date} onChange={(e) => setFormData({ ...formData, start_date: e.target.value })} className="w-full px-3 py-2 rounded dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 mt-1 text-zinc-900 dark:text-zinc-200 text-sm" />
+                        <div className="space-y-2">
+                            <Label htmlFor="start_date">Start Date</Label>
+                            <Input 
+                                id="start_date" 
+                                type="date" 
+                                value={formData.start_date} 
+                                onChange={(e) => setFormData({ ...formData, start_date: e.target.value })} 
+                            />
                         </div>
-                        <div>
-                            <label className="block text-sm mb-1">End Date</label>
-                            <input type="date" value={formData.end_date} onChange={(e) => setFormData({ ...formData, end_date: e.target.value })} min={formData.start_date && new Date(formData.start_date).toISOString().split('T')[0]} className="w-full px-3 py-2 rounded dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 mt-1 text-zinc-900 dark:text-zinc-200 text-sm" />
+                        <div className="space-y-2">
+                            <Label htmlFor="end_date">End Date</Label>
+                            <Input 
+                                id="end_date" 
+                                type="date" 
+                                value={formData.end_date} 
+                                onChange={(e) => setFormData({ ...formData, end_date: e.target.value })} 
+                                min={formData.start_date}
+                            />
                         </div>
                     </div>
 
                     {/* Lead */}
-                    <div>
-                        <label className="block text-sm mb-1">Project Lead</label>
-                        <select value={formData.team_lead} onChange={(e) => setFormData({ ...formData, team_lead: e.target.value, team_members: e.target.value ? [...new Set([...formData.team_members, e.target.value])] : formData.team_members, })} className="w-full px-3 py-2 rounded dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 mt-1 text-zinc-900 dark:text-zinc-200 text-sm" >
-                            <option value="">No lead</option>
-                            {currentWorkspace?.members?.map((member) => (
-                                <option key={member.user.email} value={member.user.email}>
-                                    {member.user.email}
-                                </option>
-                            ))}
-                        </select>
+                    <div className="space-y-2">
+                        <Label htmlFor="team_lead">Project Lead</Label>
+                        <Select 
+                            value={formData.team_lead} 
+                            onValueChange={(value) => {
+                                const lead = value === "no-lead" ? "" : value;
+                                setFormData({ 
+                                    ...formData, 
+                                    team_lead: lead, 
+                                    team_members: lead ? [...new Set([...formData.team_members, lead])] : formData.team_members 
+                                });
+                            }}
+                        >
+                            <SelectTrigger>
+                                <SelectValue placeholder="Select lead" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="no-lead">No lead</SelectItem>
+                                {currentWorkspace?.members?.map((member) => (
+                                    <SelectItem key={member.user.email} value={member.user.email}>
+                                        {member.user.email}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
                     </div>
 
                     {/* Team Members */}
-                    <div>
-                        <label className="block text-sm mb-1">Team Members</label>
-                        <select className="w-full px-3 py-2 rounded dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 mt-1 text-zinc-900 dark:text-zinc-200 text-sm"
-                            onChange={(e) => {
-                                if (e.target.value && !formData.team_members.includes(e.target.value)) {
-                                    setFormData((prev) => ({ ...prev, team_members: [...prev.team_members, e.target.value] }));
+                    <div className="space-y-2">
+                        <Label htmlFor="team_members">Team Members</Label>
+                        <Select 
+                            onValueChange={(value) => {
+                                if (value && !formData.team_members.includes(value)) {
+                                    setFormData((prev) => ({ ...prev, team_members: [...prev.team_members, value] }));
                                 }
                             }}
                         >
-                            <option value="">Add team members</option>
-                            {currentWorkspace?.members
-                                ?.filter((email) => !formData.team_members.includes(email))
-                                .map((member) => (
-                                    <option key={member.user.email} value={member.email}>
-                                        {member.user.email}
-                                    </option>
-                                ))}
-                        </select>
+                            <SelectTrigger>
+                                <SelectValue placeholder="Add team members" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {currentWorkspace?.members
+                                    ?.filter((member) => !formData.team_members.includes(member.user.email))
+                                    .map((member) => (
+                                        <SelectItem key={member.user.email} value={member.user.email}>
+                                            {member.user.email}
+                                        </SelectItem>
+                                    ))}
+                            </SelectContent>
+                        </Select>
 
                         {formData.team_members.length > 0 && (
                             <div className="flex flex-wrap gap-2 mt-2">
                                 {formData.team_members.map((email) => (
-                                    <div key={email} className="flex items-center gap-1 bg-blue-200/50 dark:bg-blue-500/20 text-blue-700 dark:text-blue-400 px-2 py-1 rounded-md text-sm" >
+                                    <Badge key={email} variant="secondary" className="gap-1">
                                         {email}
-                                        <button type="button" onClick={() => removeTeamMember(email)} className="ml-1 hover:bg-blue-300/30 dark:hover:bg-blue-500/30 rounded" >
+                                        <button type="button" onClick={() => removeTeamMember(email)} className="ml-1 hover:text-destructive">
                                             <XIcon className="w-3 h-3" />
                                         </button>
-                                    </div>
+                                    </Badge>
                                 ))}
                             </div>
                         )}
                     </div>
 
-                    {/* Footer */}
-                    <div className="flex justify-end gap-3 pt-2 text-sm">
-                        <button type="button" onClick={() => setIsDialogOpen(false)} className="px-4 py-2 rounded border border-zinc-300 dark:border-zinc-700 hover:bg-zinc-200 dark:hover:bg-zinc-800" >
+                    <DialogFooter>
+                        <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
                             Cancel
-                        </button>
-                        <button disabled={isSubmitting || !currentWorkspace} className="px-4 py-2 rounded bg-gradient-to-br from-blue-500 to-blue-600 text-white dark:text-zinc-200" >
+                        </Button>
+                        <Button type="submit" disabled={isSubmitting || !currentWorkspace}>
                             {isSubmitting ? "Creating..." : "Create Project"}
-                        </button>
-                    </div>
+                        </Button>
+                    </DialogFooter>
                 </form>
-            </div>
-        </div>
+            </DialogContent>
+        </Dialog>
     );
 };
 

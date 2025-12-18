@@ -5,9 +5,9 @@ import { Outlet } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { loadTheme } from '../features/themeSlice'
 import { Loader2Icon } from 'lucide-react'
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 
 const Layout = () => {
-    const [isSidebarOpen, setIsSidebarOpen] = useState(false)
     const { loading } = useSelector((state) => state.workspace)
     const dispatch = useDispatch()
 
@@ -17,21 +17,23 @@ const Layout = () => {
     }, [])
 
     if (loading) return (
-        <div className='flex items-center justify-center h-screen bg-white dark:bg-zinc-950'>
-            <Loader2Icon className="size-7 text-blue-500 animate-spin" />
+        <div className='flex items-center justify-center h-screen bg-background'>
+            <Loader2Icon className="size-7 text-primary animate-spin" />
         </div>
     )
 
     return (
-        <div className="flex bg-white dark:bg-zinc-950 text-gray-900 dark:text-slate-100">
-            <Sidebar isSidebarOpen={isSidebarOpen} setIsSidebarOpen={setIsSidebarOpen} />
-            <div className="flex-1 flex flex-col h-screen">
-                <Navbar isSidebarOpen={isSidebarOpen} setIsSidebarOpen={setIsSidebarOpen} />
-                <div className="flex-1 h-full p-6 xl:p-10 xl:px-16 overflow-y-scroll">
-                    <Outlet />
+        <SidebarProvider>
+            <div className="flex w-full bg-background text-foreground">
+                <Sidebar />
+                <div className="flex-1 flex flex-col h-screen overflow-hidden">
+                    <Navbar />
+                    <div className="flex-1 h-full p-6 xl:p-10 xl:px-16 overflow-y-auto">
+                        <Outlet />
+                    </div>
                 </div>
             </div>
-        </div>
+        </SidebarProvider>
     )
 }
 

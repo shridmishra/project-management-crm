@@ -5,19 +5,39 @@ import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { deleteTask, updateTask } from "../features/workspaceSlice";
 import { Bug, CalendarIcon, GitCommit, MessageSquare, Square, Trash, XIcon, Zap } from "lucide-react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
+import { Checkbox } from "@/components/ui/checkbox"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Card, CardContent } from "@/components/ui/card"
 
 const typeIcons = {
-    BUG: { icon: Bug, color: "text-red-600 dark:text-red-400" },
-    FEATURE: { icon: Zap, color: "text-blue-600 dark:text-blue-400" },
-    TASK: { icon: Square, color: "text-green-600 dark:text-green-400" },
-    IMPROVEMENT: { icon: GitCommit, color: "text-purple-600 dark:text-purple-400" },
-    OTHER: { icon: MessageSquare, color: "text-amber-600 dark:text-amber-400" },
+    BUG: { icon: Bug, color: "text-destructive" },
+    FEATURE: { icon: Zap, color: "text-info" },
+    TASK: { icon: Square, color: "text-success" },
+    IMPROVEMENT: { icon: GitCommit, color: "text-primary" },
+    OTHER: { icon: MessageSquare, color: "text-warning" },
 };
 
-const priorityTexts = {
-    LOW: { background: "bg-red-100 dark:bg-red-950", prioritycolor: "text-red-600 dark:text-red-400" },
-    MEDIUM: { background: "bg-blue-100 dark:bg-blue-950", prioritycolor: "text-blue-600 dark:text-blue-400" },
-    HIGH: { background: "bg-emerald-100 dark:bg-emerald-950", prioritycolor: "text-emerald-600 dark:text-emerald-400" },
+const priorityVariants = {
+    LOW: "secondary",
+    MEDIUM: "default",
+    HIGH: "destructive",
 };
 
 const ProjectTasks = ({ tasks }) => {
@@ -49,16 +69,13 @@ const ProjectTasks = ({ tasks }) => {
         });
     }, [filters, tasks]);
 
-    const handleFilterChange = (e) => {
-        const { name, value } = e.target;
-        setFilters((prev) => ({ ...prev, [name]: value }));
+    const handleFilterChange = (name, value) => {
+        setFilters((prev) => ({ ...prev, [name]: value === "ALL" ? "" : value }));
     };
 
     const handleStatusChange = async (taskId, newStatus) => {
         try {
             toast.loading("Updating status...");
-
-            //  Simulate API call
             await new Promise((resolve) => setTimeout(resolve, 2000));
 
             let updatedTask = structuredClone(tasks.find((t) => t.id === taskId));
@@ -79,201 +96,262 @@ const ProjectTasks = ({ tasks }) => {
             if (!confirm) return;
 
             toast.loading("Deleting tasks...");
-
-            //  Simulate API call
             await new Promise((resolve) => setTimeout(resolve, 2000));
 
             dispatch(deleteTask(selectedTasks));
 
             toast.dismissAll();
             toast.success("Tasks deleted successfully");
+            setSelectedTasks([]);
         } catch (error) {
             toast.dismissAll();
             toast.error(error?.response?.data?.message || error.message);
         }
     };
 
+    const toggleSelectAll = () => {
+        if (selectedTasks.length === tasks.length) {
+            setSelectedTasks([]);
+        } else {
+            setSelectedTasks(tasks.map((t) => t.id));
+        }
+    };
+
+    const toggleSelectTask = (taskId) => {
+        if (selectedTasks.includes(taskId)) {
+            setSelectedTasks(selectedTasks.filter((id) => id !== taskId));
+        } else {
+            setSelectedTasks([...selectedTasks, taskId]);
+        }
+    };
+
     return (
-        <div>
+        <div className="space-y-4">
             {/* Filters */}
-            <div className="flex flex-wrap gap-4 mb-4">
-                {["status", "type", "priority", "assignee"].map((name) => {
-                    const options = {
-                        status: [
-                            { label: "All Statuses", value: "" },
-                            { label: "To Do", value: "TODO" },
-                            { label: "In Progress", value: "IN_PROGRESS" },
-                            { label: "Done", value: "DONE" },
-                        ],
-                        type: [
-                            { label: "All Types", value: "" },
-                            { label: "Task", value: "TASK" },
-                            { label: "Bug", value: "BUG" },
-                            { label: "Feature", value: "FEATURE" },
-                            { label: "Improvement", value: "IMPROVEMENT" },
-                            { label: "Other", value: "OTHER" },
-                        ],
-                        priority: [
-                            { label: "All Priorities", value: "" },
-                            { label: "Low", value: "LOW" },
-                            { label: "Medium", value: "MEDIUM" },
-                            { label: "High", value: "HIGH" },
-                        ],
-                        assignee: [
-                            { label: "All Assignees", value: "" },
-                            ...assigneeList.map((n) => ({ label: n, value: n })),
-                        ],
-                    };
-                    return (
-                        <select key={name} name={name} onChange={handleFilterChange} className=" border not-dark:bg-white border-zinc-300 dark:border-zinc-800 outline-none px-3 py-1 rounded text-sm text-zinc-900 dark:text-zinc-200" >
-                            {options[name].map((opt, idx) => (
-                                <option key={idx} value={opt.value}>{opt.label}</option>
-                            ))}
-                        </select>
-                    );
-                })}
+            <div className="flex flex-wrap gap-4">
+                <Select value={filters.status || "ALL"} onValueChange={(val) => handleFilterChange("status", val)}>
+                    <SelectTrigger className="w-[150px]">
+                        <SelectValue placeholder="All Statuses" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="ALL">All Statuses</SelectItem>
+                        <SelectItem value="TODO">To Do</SelectItem>
+                        <SelectItem value="IN_PROGRESS">In Progress</SelectItem>
+                        <SelectItem value="DONE">Done</SelectItem>
+                    </SelectContent>
+                </Select>
+
+                <Select value={filters.type || "ALL"} onValueChange={(val) => handleFilterChange("type", val)}>
+                    <SelectTrigger className="w-[150px]">
+                        <SelectValue placeholder="All Types" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="ALL">All Types</SelectItem>
+                        <SelectItem value="TASK">Task</SelectItem>
+                        <SelectItem value="BUG">Bug</SelectItem>
+                        <SelectItem value="FEATURE">Feature</SelectItem>
+                        <SelectItem value="IMPROVEMENT">Improvement</SelectItem>
+                        <SelectItem value="OTHER">Other</SelectItem>
+                    </SelectContent>
+                </Select>
+
+                <Select value={filters.priority || "ALL"} onValueChange={(val) => handleFilterChange("priority", val)}>
+                    <SelectTrigger className="w-[150px]">
+                        <SelectValue placeholder="All Priorities" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="ALL">All Priorities</SelectItem>
+                        <SelectItem value="LOW">Low</SelectItem>
+                        <SelectItem value="MEDIUM">Medium</SelectItem>
+                        <SelectItem value="HIGH">High</SelectItem>
+                    </SelectContent>
+                </Select>
+
+                <Select value={filters.assignee || "ALL"} onValueChange={(val) => handleFilterChange("assignee", val)}>
+                    <SelectTrigger className="w-[150px]">
+                        <SelectValue placeholder="All Assignees" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="ALL">All Assignees</SelectItem>
+                        {assigneeList.map((n) => (
+                            <SelectItem key={n} value={n}>{n}</SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
 
                 {/* Reset filters */}
                 {(filters.status || filters.type || filters.priority || filters.assignee) && (
-                    <button type="button" onClick={() => setFilters({ status: "", type: "", priority: "", assignee: "" })} className="px-3 py-1 flex items-center gap-2 rounded bg-gradient-to-br from-purple-400 to-purple-500 text-zinc-100 dark:text-zinc-200 text-sm transition-colors" >
-                        <XIcon className="size-3" /> Reset
-                    </button>
+                    <Button variant="ghost" onClick={() => setFilters({ status: "", type: "", priority: "", assignee: "" })}>
+                        <XIcon className="mr-2 h-4 w-4" /> Reset
+                    </Button>
                 )}
 
                 {selectedTasks.length > 0 && (
-                    <button type="button" onClick={handleDelete} className="px-3 py-1 flex items-center gap-2 rounded bg-gradient-to-br from-indigo-400 to-indigo-500 text-zinc-100 dark:text-zinc-200 text-sm transition-colors" >
-                        <Trash className="size-3" /> Delete
-                    </button>
+                    <Button variant="destructive" onClick={handleDelete}>
+                        <Trash className="mr-2 h-4 w-4" /> Delete
+                    </Button>
                 )}
             </div>
 
             {/* Tasks Table */}
-            <div className="overflow-auto rounded-lg lg:border border-zinc-300 dark:border-zinc-800">
-                <div className="w-full">
-                    {/* Desktop/Table View */}
-                    <div className="hidden lg:block overflow-x-auto">
-                        <table className="min-w-full text-sm text-left not-dark:bg-white text-zinc-900 dark:text-zinc-300">
-                            <thead className="text-xs uppercase dark:bg-zinc-800/70 text-zinc-500 dark:text-zinc-400 ">
-                                <tr>
-                                    <th className="pl-2 pr-1">
-                                        <input onChange={() => selectedTasks.length > 1 ? setSelectedTasks([]) : setSelectedTasks(tasks.map((t) => t.id))} checked={selectedTasks.length === tasks.length} type="checkbox" className="size-3 accent-zinc-600 dark:accent-zinc-500" />
-                                    </th>
-                                    <th className="px-4 pl-0 py-3">Title</th>
-                                    <th className="px-4 py-3">Type</th>
-                                    <th className="px-4 py-3">Priority</th>
-                                    <th className="px-4 py-3">Status</th>
-                                    <th className="px-4 py-3">Assignee</th>
-                                    <th className="px-4 py-3">Due Date</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {filteredTasks.length > 0 ? (
-                                    filteredTasks.map((task) => {
-                                        const { icon: Icon, color } = typeIcons[task.type] || {};
-                                        const { background, prioritycolor } = priorityTexts[task.priority] || {};
+            <div className="rounded-md border">
+                <div className="hidden lg:block">
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead className="w-[50px]">
+                                    <Checkbox 
+                                        checked={tasks.length > 0 && selectedTasks.length === tasks.length} 
+                                        onCheckedChange={toggleSelectAll} 
+                                    />
+                                </TableHead>
+                                <TableHead>Title</TableHead>
+                                <TableHead>Type</TableHead>
+                                <TableHead>Priority</TableHead>
+                                <TableHead>Status</TableHead>
+                                <TableHead>Assignee</TableHead>
+                                <TableHead>Due Date</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {filteredTasks.length > 0 ? (
+                                filteredTasks.map((task) => {
+                                    const { icon: Icon, color } = typeIcons[task.type] || {};
 
-                                        return (
-                                            <tr key={task.id} onClick={() => navigate(`/taskDetails?projectId=${task.projectId}&taskId=${task.id}`)} className=" border-t border-zinc-300 dark:border-zinc-800 group hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-all cursor-pointer" >
-                                                <td onClick={e => e.stopPropagation()} className="pl-2 pr-1">
-                                                    <input type="checkbox" className="size-3 accent-zinc-600 dark:accent-zinc-500" onChange={() => selectedTasks.includes(task.id) ? setSelectedTasks(selectedTasks.filter((i) => i !== task.id)) : setSelectedTasks((prev) => [...prev, task.id])} checked={selectedTasks.includes(task.id)} />
-                                                </td>
-                                                <td className="px-4 pl-0 py-2">{task.title}</td>
-                                                <td className="px-4 py-2">
-                                                    <div className="flex items-center gap-2">
-                                                        {Icon && <Icon className={`size-4 ${color}`} />}
-                                                        <span className={`uppercase text-xs ${color}`}>{task.type}</span>
-                                                    </div>
-                                                </td>
-                                                <td className="px-4 py-2">
-                                                    <span className={`text-xs px-2 py-1 rounded ${background} ${prioritycolor}`}>
-                                                        {task.priority}
-                                                    </span>
-                                                </td>
-                                                <td onClick={e => e.stopPropagation()} className="px-4 py-2">
-                                                    <select name="status" onChange={(e) => handleStatusChange(task.id, e.target.value)} value={task.status} className="group-hover:ring ring-zinc-100 outline-none px-2 pr-4 py-1 rounded text-sm text-zinc-900 dark:text-zinc-200 cursor-pointer" >
-                                                        <option value="TODO">To Do</option>
-                                                        <option value="IN_PROGRESS">In Progress</option>
-                                                        <option value="DONE">Done</option>
-                                                    </select>
-                                                </td>
-                                                <td className="px-4 py-2">
-                                                    <div className="flex items-center gap-2">
-                                                        <img src={task.assignee?.image} className="size-5 rounded-full" alt="avatar" />
-                                                        {task.assignee?.name || "-"}
-                                                    </div>
-                                                </td>
-                                                <td className="px-4 py-2">
-                                                    <div className="flex items-center gap-1 text-zinc-600 dark:text-zinc-400">
-                                                        <CalendarIcon className="size-4" />
-                                                        {format(new Date(task.due_date), "dd MMMM")}
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        );
-                                    })
-                                ) : (
-                                    <tr>
-                                        <td colSpan="7" className="text-center text-zinc-500 dark:text-zinc-400 py-6">
-                                            No tasks found for the selected filters.
-                                        </td>
-                                    </tr>
-                                )}
-                            </tbody>
-                        </table>
-                    </div>
+                                    return (
+                                        <TableRow 
+                                            key={task.id} 
+                                            className="cursor-pointer hover:bg-muted/50"
+                                            onClick={() => navigate(`/taskDetails?projectId=${task.projectId}&taskId=${task.id}`)}
+                                        >
+                                            <TableCell onClick={(e) => e.stopPropagation()}>
+                                                <Checkbox 
+                                                    checked={selectedTasks.includes(task.id)} 
+                                                    onCheckedChange={() => toggleSelectTask(task.id)} 
+                                                />
+                                            </TableCell>
+                                            <TableCell className="font-medium">{task.title}</TableCell>
+                                            <TableCell>
+                                                <div className="flex items-center gap-2">
+                                                    {Icon && <Icon className={`h-4 w-4 ${color}`} />}
+                                                    <span className="text-xs font-medium">{task.type}</span>
+                                                </div>
+                                            </TableCell>
+                                            <TableCell>
+                                                <Badge variant={priorityVariants[task.priority]}>
+                                                    {task.priority}
+                                                </Badge>
+                                            </TableCell>
+                                            <TableCell onClick={(e) => e.stopPropagation()}>
+                                                <Select 
+                                                    value={task.status} 
+                                                    onValueChange={(val) => handleStatusChange(task.id, val)}
+                                                >
+                                                    <SelectTrigger className="h-8 w-[130px]">
+                                                        <SelectValue />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        <SelectItem value="TODO">To Do</SelectItem>
+                                                        <SelectItem value="IN_PROGRESS">In Progress</SelectItem>
+                                                        <SelectItem value="DONE">Done</SelectItem>
+                                                    </SelectContent>
+                                                </Select>
+                                            </TableCell>
+                                            <TableCell>
+                                                <div className="flex items-center gap-2">
+                                                    <Avatar className="h-6 w-6">
+                                                        <AvatarImage src={task.assignee?.image} />
+                                                        <AvatarFallback>{task.assignee?.name?.[0]}</AvatarFallback>
+                                                    </Avatar>
+                                                    <span className="text-sm">{task.assignee?.name || "-"}</span>
+                                                </div>
+                                            </TableCell>
+                                            <TableCell>
+                                                <div className="flex items-center gap-2 text-muted-foreground">
+                                                    <CalendarIcon className="h-4 w-4" />
+                                                    {format(new Date(task.due_date), "dd MMM")}
+                                                </div>
+                                            </TableCell>
+                                        </TableRow>
+                                    );
+                                })
+                            ) : (
+                                <TableRow>
+                                    <TableCell colSpan={7} className="h-24 text-center">
+                                        No tasks found for the selected filters.
+                                    </TableCell>
+                                </TableRow>
+                            )}
+                        </TableBody>
+                    </Table>
+                </div>
 
-                    {/* Mobile/Card View */}
-                    <div className="lg:hidden flex flex-col gap-4">
-                        {filteredTasks.length > 0 ? (
-                            filteredTasks.map((task) => {
-                                const { icon: Icon, color } = typeIcons[task.type] || {};
-                                const { background, prioritycolor } = priorityTexts[task.priority] || {};
+                {/* Mobile/Card View */}
+                <div className="lg:hidden flex flex-col gap-4 p-4">
+                    {filteredTasks.length > 0 ? (
+                        filteredTasks.map((task) => {
+                            const { icon: Icon, color } = typeIcons[task.type] || {};
 
-                                return (
-                                    <div key={task.id} className=" dark:bg-gradient-to-br dark:from-zinc-800/70 dark:to-zinc-900/50 border border-zinc-300 dark:border-zinc-800 rounded-lg p-4 flex flex-col gap-2">
+                            return (
+                                <Card key={task.id}>
+                                    <CardContent className="p-4 flex flex-col gap-3">
                                         <div className="flex items-center justify-between">
-                                            <h3 className="text-zinc-900 dark:text-zinc-200 text-sm font-semibold">{task.title}</h3>
-                                            <input type="checkbox" className="size-4 accent-zinc-600 dark:accent-zinc-500" onChange={() => selectedTasks.includes(task.id) ? setSelectedTasks(selectedTasks.filter((i) => i !== task.id)) : setSelectedTasks((prev) => [...prev, task.id])} checked={selectedTasks.includes(task.id)} />
+                                            <h3 className="font-semibold">{task.title}</h3>
+                                            <Checkbox 
+                                                checked={selectedTasks.includes(task.id)} 
+                                                onCheckedChange={() => toggleSelectTask(task.id)} 
+                                            />
                                         </div>
 
-                                        <div className="text-xs text-zinc-600 dark:text-zinc-400 flex items-center gap-2">
-                                            {Icon && <Icon className={`size-4 ${color}`} />}
-                                            <span className={`${color} uppercase`}>{task.type}</span>
+                                        <div className="flex items-center gap-2 text-sm">
+                                            {Icon && <Icon className={`h-4 w-4 ${color}`} />}
+                                            <span className="font-medium">{task.type}</span>
                                         </div>
 
                                         <div>
-                                            <span className={`text-xs px-2 py-1 rounded ${background} ${prioritycolor}`}>
+                                            <Badge variant={priorityVariants[task.priority]}>
                                                 {task.priority}
-                                            </span>
+                                            </Badge>
                                         </div>
 
                                         <div>
-                                            <label className="text-zinc-600 dark:text-zinc-400 text-xs">Status</label>
-                                            <select name="status" onChange={(e) => handleStatusChange(task.id, e.target.value)} value={task.status} className="w-full mt-1 bg-zinc-100 dark:bg-zinc-800 ring-1 ring-zinc-300 dark:ring-zinc-700 outline-none px-2 py-1 rounded text-sm text-zinc-900 dark:text-zinc-200" >
-                                                <option value="TODO">To Do</option>
-                                                <option value="IN_PROGRESS">In Progress</option>
-                                                <option value="DONE">Done</option>
-                                            </select>
+                                            <label className="text-xs text-muted-foreground mb-1 block">Status</label>
+                                            <Select 
+                                                value={task.status} 
+                                                onValueChange={(val) => handleStatusChange(task.id, val)}
+                                            >
+                                                <SelectTrigger className="w-full">
+                                                    <SelectValue />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="TODO">To Do</SelectItem>
+                                                    <SelectItem value="IN_PROGRESS">In Progress</SelectItem>
+                                                    <SelectItem value="DONE">Done</SelectItem>
+                                                </SelectContent>
+                                            </Select>
                                         </div>
 
-                                        <div className="flex items-center gap-2 text-sm text-zinc-700 dark:text-zinc-300">
-                                            <img src={task.assignee?.image} className="size-5 rounded-full" alt="avatar" />
-                                            {task.assignee?.name || "-"}
+                                        <div className="flex items-center gap-2 text-sm">
+                                            <Avatar className="h-6 w-6">
+                                                <AvatarImage src={task.assignee?.image} />
+                                                <AvatarFallback>{task.assignee?.name?.[0]}</AvatarFallback>
+                                            </Avatar>
+                                            <span>{task.assignee?.name || "-"}</span>
                                         </div>
 
-                                        <div className="flex items-center gap-2 text-sm text-zinc-600 dark:text-zinc-400">
-                                            <CalendarIcon className="size-4" />
+                                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                            <CalendarIcon className="h-4 w-4" />
                                             {format(new Date(task.due_date), "dd MMMM")}
                                         </div>
-                                    </div>
-                                );
-                            })
-                        ) : (
-                            <p className="text-center text-zinc-500 dark:text-zinc-400 py-4">
-                                No tasks found for the selected filters.
-                            </p>
-                        )}
-                    </div>
+                                    </CardContent>
+                                </Card>
+                            );
+                        })
+                    ) : (
+                        <p className="text-center text-muted-foreground py-4">
+                            No tasks found for the selected filters.
+                        </p>
+                    )}
                 </div>
             </div>
         </div>

@@ -1,7 +1,24 @@
 import { useState } from "react";
-import { Calendar as CalendarIcon } from "lucide-react";
 import { useSelector } from "react-redux";
 import { format } from "date-fns";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
+import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 
 export default function CreateTaskDialog({ showCreateTask, setShowCreateTask, projectId }) {
     const currentWorkspace = useSelector((state) => state.workspace?.currentWorkspace || null);
@@ -21,100 +38,147 @@ export default function CreateTaskDialog({ showCreateTask, setShowCreateTask, pr
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
-
+        
     };
 
-    return showCreateTask ? (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 dark:bg-black/60 backdrop-blur">
-            <div className="bg-white dark:bg-zinc-950 border border-zinc-300 dark:border-zinc-800 rounded-lg shadow-lg w-full max-w-md p-6 text-zinc-900 dark:text-white">
-                <h2 className="text-xl font-bold mb-4">Create New Task</h2>
+    return (
+        <Dialog open={showCreateTask} onOpenChange={setShowCreateTask}>
+            <DialogContent className="sm:max-w-[500px]">
+                <DialogHeader>
+                    <DialogTitle>Create New Task</DialogTitle>
+                </DialogHeader>
 
-                <form onSubmit={handleSubmit} className="space-y-4">
+                <form onSubmit={handleSubmit} className="space-y-4 py-4">
                     {/* Title */}
-                    <div className="space-y-1">
-                        <label htmlFor="title" className="text-sm font-medium">Title</label>
-                        <input value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} placeholder="Task title" className="w-full rounded dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 px-3 py-2 text-zinc-900 dark:text-zinc-200 text-sm mt-1 focus:outline-none focus:ring-2 focus:ring-blue-500" required />
+                    <div className="space-y-2">
+                        <Label htmlFor="title">Title</Label>
+                        <Input 
+                            id="title" 
+                            value={formData.title} 
+                            onChange={(e) => setFormData({ ...formData, title: e.target.value })} 
+                            placeholder="Task title" 
+                            required 
+                        />
                     </div>
 
                     {/* Description */}
-                    <div className="space-y-1">
-                        <label htmlFor="description" className="text-sm font-medium">Description</label>
-                        <textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} placeholder="Describe the task" className="w-full rounded dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 px-3 py-2 text-zinc-900 dark:text-zinc-200 text-sm mt-1 h-24 focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                    <div className="space-y-2">
+                        <Label htmlFor="description">Description</Label>
+                        <Textarea 
+                            id="description" 
+                            value={formData.description} 
+                            onChange={(e) => setFormData({ ...formData, description: e.target.value })} 
+                            placeholder="Describe the task" 
+                            className="h-24"
+                        />
                     </div>
 
                     {/* Type & Priority */}
                     <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-1">
-                            <label className="text-sm font-medium">Type</label>
-                            <select value={formData.type} onChange={(e) => setFormData({ ...formData, type: e.target.value })} className="w-full rounded dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 px-3 py-2 text-zinc-900 dark:text-zinc-200 text-sm mt-1" >
-                                <option value="BUG">Bug</option>
-                                <option value="FEATURE">Feature</option>
-                                <option value="TASK">Task</option>
-                                <option value="IMPROVEMENT">Improvement</option>
-                                <option value="OTHER">Other</option>
-                            </select>
+                        <div className="space-y-2">
+                            <Label htmlFor="type">Type</Label>
+                            <Select 
+                                value={formData.type} 
+                                onValueChange={(value) => setFormData({ ...formData, type: value })}
+                            >
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select type" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="BUG">Bug</SelectItem>
+                                    <SelectItem value="FEATURE">Feature</SelectItem>
+                                    <SelectItem value="TASK">Task</SelectItem>
+                                    <SelectItem value="IMPROVEMENT">Improvement</SelectItem>
+                                    <SelectItem value="OTHER">Other</SelectItem>
+                                </SelectContent>
+                            </Select>
                         </div>
 
-                        <div className="space-y-1">
-                            <label className="text-sm font-medium">Priority</label>
-                            <select value={formData.priority} onChange={(e) => setFormData({ ...formData, priority: e.target.value })} className="w-full rounded dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 px-3 py-2 text-zinc-900 dark:text-zinc-200 text-sm mt-1"                             >
-                                <option value="LOW">Low</option>
-                                <option value="MEDIUM">Medium</option>
-                                <option value="HIGH">High</option>
-                            </select>
+                        <div className="space-y-2">
+                            <Label htmlFor="priority">Priority</Label>
+                            <Select 
+                                value={formData.priority} 
+                                onValueChange={(value) => setFormData({ ...formData, priority: value })}
+                            >
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select priority" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="LOW">Low</SelectItem>
+                                    <SelectItem value="MEDIUM">Medium</SelectItem>
+                                    <SelectItem value="HIGH">High</SelectItem>
+                                </SelectContent>
+                            </Select>
                         </div>
                     </div>
 
                     {/* Assignee and Status */}
                     <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-1">
-                            <label className="text-sm font-medium">Assignee</label>
-                            <select value={formData.assigneeId} onChange={(e) => setFormData({ ...formData, assigneeId: e.target.value })} className="w-full rounded dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 px-3 py-2 text-zinc-900 dark:text-zinc-200 text-sm mt-1" >
-                                <option value="">Unassigned</option>
-                                {teamMembers.map((member) => (
-                                    <option key={member?.user.id} value={member?.user.id}>
-                                        {member?.user.email}
-                                    </option>
-                                ))}
-                            </select>
+                        <div className="space-y-2">
+                            <Label htmlFor="assignee">Assignee</Label>
+                            <Select 
+                                value={formData.assigneeId} 
+                                onValueChange={(value) => setFormData({ ...formData, assigneeId: value === "unassigned" ? "" : value })}
+                            >
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Unassigned" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="unassigned">Unassigned</SelectItem>
+                                    {teamMembers.map((member) => (
+                                        <SelectItem key={member?.user.id} value={member?.user.id}>
+                                            {member?.user.email}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
                         </div>
 
-                        <div className="space-y-1">
-                            <label className="text-sm font-medium">Status</label>
-                            <select value={formData.status} onChange={(e) => setFormData({ ...formData, status: e.target.value })} className="w-full rounded dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 px-3 py-2 text-zinc-900 dark:text-zinc-200 text-sm mt-1" >
-                                <option value="TODO">To Do</option>
-                                <option value="IN_PROGRESS">In Progress</option>
-                                <option value="DONE">Done</option>
-                            </select>
+                        <div className="space-y-2">
+                            <Label htmlFor="status">Status</Label>
+                            <Select 
+                                value={formData.status} 
+                                onValueChange={(value) => setFormData({ ...formData, status: value })}
+                            >
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select status" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="TODO">To Do</SelectItem>
+                                    <SelectItem value="IN_PROGRESS">In Progress</SelectItem>
+                                    <SelectItem value="DONE">Done</SelectItem>
+                                </SelectContent>
+                            </Select>
                         </div>
                     </div>
 
                     {/* Due Date */}
-                    <div className="space-y-1">
-                        <label className="text-sm font-medium">Due Date</label>
-                        <div className="flex items-center gap-2">
-                            <CalendarIcon className="size-5 text-zinc-500 dark:text-zinc-400" />
-                            <input type="date" value={formData.due_date} onChange={(e) => setFormData({ ...formData, due_date: e.target.value })} min={new Date().toISOString().split('T')[0]} className="w-full rounded dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 px-3 py-2 text-zinc-900 dark:text-zinc-200 text-sm mt-1" />
-                        </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="due_date">Due Date</Label>
+                        <Input 
+                            id="due_date" 
+                            type="date" 
+                            value={formData.due_date} 
+                            onChange={(e) => setFormData({ ...formData, due_date: e.target.value })} 
+                            min={new Date().toISOString().split('T')[0]}
+                        />
                         {formData.due_date && (
-                            <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                            <p className="text-xs text-muted-foreground">
                                 {format(new Date(formData.due_date), "PPP")}
                             </p>
                         )}
                     </div>
 
-                    {/* Footer */}
-                    <div className="flex justify-end gap-2 pt-2">
-                        <button type="button" onClick={() => setShowCreateTask(false)} className="rounded border border-zinc-300 dark:border-zinc-700 px-5 py-2 text-sm hover:bg-zinc-100 dark:hover:bg-zinc-800 transition" >
+                    <DialogFooter>
+                        <Button type="button" variant="outline" onClick={() => setShowCreateTask(false)}>
                             Cancel
-                        </button>
-                        <button type="submit" disabled={isSubmitting} className="rounded px-5 py-2 text-sm bg-gradient-to-br from-blue-500 to-blue-600 hover:opacity-90 text-white dark:text-zinc-200 transition" >
+                        </Button>
+                        <Button type="submit" disabled={isSubmitting}>
                             {isSubmitting ? "Creating..." : "Create Task"}
-                        </button>
-                    </div>
+                        </Button>
+                    </DialogFooter>
                 </form>
-            </div>
-        </div>
-    ) : null;
+            </DialogContent>
+        </Dialog>
+    );
 }

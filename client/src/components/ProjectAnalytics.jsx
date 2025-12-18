@@ -1,13 +1,20 @@
 import { useMemo } from "react";
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 import { CheckCircle, Clock, AlertTriangle, Users, ArrowRightIcon } from "lucide-react";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
+import { Progress } from "@/components/ui/progress"
 
 // Colors for charts and priorities
-const COLORS = ["#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6"];
+const COLORS = ["var(--info)", "var(--success)", "var(--warning)", "var(--destructive)", "var(--primary)"];
 const PRIORITY_COLORS = {
-    LOW: "text-red-600 bg-red-200 dark:text-red-500 dark:bg-red-600",
-    MEDIUM: "text-blue-600 bg-blue-200 dark:text-blue-500 dark:bg-blue-600",
-    HIGH: "text-emerald-600 bg-emerald-200 dark:text-emerald-500 dark:bg-emerald-600",
+    LOW: "bg-destructive",
+    MEDIUM: "bg-info",
+    HIGH: "bg-success",
 };
 
 const ProjectAnalytics = ({ project, tasks }) => {
@@ -56,30 +63,30 @@ const ProjectAnalytics = ({ project, tasks }) => {
         {
             label: "Completion Rate",
             value: `${completionRate}%`,
-            color: "text-emerald-600 dark:text-emerald-400",
-            icon: <CheckCircle className="size-5 text-emerald-600 dark:text-emerald-400" />,
-            bg: "bg-emerald-200 dark:bg-emerald-500/10",
+            color: "text-success",
+            icon: <CheckCircle className="size-5 text-success" />,
+            bg: "bg-success/20",
         },
         {
             label: "Active Tasks",
             value: stats.inProgress,
-            color: "text-blue-600 dark:text-blue-400",
-            icon: <Clock className="size-5 text-blue-600 dark:text-blue-400" />,
-            bg: "bg-blue-200 dark:bg-blue-500/10",
+            color: "text-info",
+            icon: <Clock className="size-5 text-info" />,
+            bg: "bg-info/20",
         },
         {
             label: "Overdue Tasks",
             value: stats.overdue,
-            color: "text-red-600 dark:text-red-400",
-            icon: <AlertTriangle className="size-5 text-red-600 dark:text-red-400" />,
-            bg: "bg-red-200 dark:bg-red-500/10",
+            color: "text-destructive",
+            icon: <AlertTriangle className="size-5 text-destructive" />,
+            bg: "bg-destructive/20",
         },
         {
             label: "Team Size",
             value: project?.members?.length || 0,
-            color: "text-purple-600 dark:text-purple-400",
-            icon: <Users className="size-5 text-purple-600 dark:text-purple-400" />,
-            bg: "bg-purple-200 dark:bg-purple-500/10",
+            color: "text-primary",
+            icon: <Users className="size-5 text-primary" />,
+            bg: "bg-primary/20",
         },
     ];
 
@@ -88,91 +95,96 @@ const ProjectAnalytics = ({ project, tasks }) => {
             {/* Metrics */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {metrics.map((m, i) => (
-                    <div
-                        key={i}
-                        className="not-dark:bg-white dark:bg-gradient-to-br dark:from-zinc-800/70 dark:to-zinc-900/50 border border-zinc-300 dark:border-zinc-800 rounded-lg p-6"
-                    >
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <p className="text-zinc-600 dark:text-zinc-400 text-sm">{m.label}</p>
-                                <p className={`text-xl font-bold ${m.color}`}>{m.value}</p>
+                    <Card key={i}>
+                        <CardContent className="p-6">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <p className="text-sm font-medium text-muted-foreground">{m.label}</p>
+                                    <p className={`text-2xl font-bold ${m.color}`}>{m.value}</p>
+                                </div>
+                                <div className={`p-2 rounded-md ${m.bg}`}>{m.icon}</div>
                             </div>
-                            <div className={`p-2 rounded-md ${m.bg}`}>{m.icon}</div>
-                        </div>
-                    </div>
+                        </CardContent>
+                    </Card>
                 ))}
             </div>
 
             {/* Charts */}
             <div className="grid lg:grid-cols-2 gap-6">
                 {/* Tasks by Status */}
-                <div className="not-dark:bg-white dark:bg-gradient-to-br dark:from-zinc-800/70 dark:to-zinc-900/50 border border-zinc-300 dark:border-zinc-800 rounded-lg p-6">
-                    <h2 className="text-zinc-900 dark:text-white mb-4 font-medium">Tasks by Status</h2>
-                    <ResponsiveContainer width="100%" height={300}>
-                        <BarChart data={statusData}>
-                            <XAxis
-                                dataKey="name"
-                                tick={{ fill: "#52525b", fontSize: 12 }}
-                                axisLine={{ stroke: "#d4d4d8" }}
-                                dark={{ stroke: "#27272a" }}
-                            />
-                            <YAxis tick={{ fill: "#52525b", fontSize: 12 }} axisLine={{ stroke: "#d4d4d8" }} />
-                            <Bar dataKey="value" fill="#3b82f6" radius={[4, 4, 0, 0]} />
-                        </BarChart>
-                    </ResponsiveContainer>
-                </div>
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Tasks by Status</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <ResponsiveContainer width="100%" height={300}>
+                            <BarChart data={statusData}>
+                                <XAxis
+                                    dataKey="name"
+                                    tick={{ fill: "var(--muted-foreground)", fontSize: 12 }}
+                                    axisLine={{ stroke: "var(--border)" }}
+                                />
+                                <YAxis tick={{ fill: "var(--muted-foreground)", fontSize: 12 }} axisLine={{ stroke: "var(--border)" }} />
+                                <Bar dataKey="value" fill="var(--info)" radius={[4, 4, 0, 0]} />
+                            </BarChart>
+                        </ResponsiveContainer>
+                    </CardContent>
+                </Card>
 
                 {/* Tasks by Type */}
-                <div className="not-dark:bg-white dark:bg-gradient-to-br dark:from-zinc-800/70 dark:to-zinc-900/50 border border-zinc-300 dark:border-zinc-800 rounded-lg p-6">
-                    <h2 className="text-zinc-900 dark:text-white mb-4 font-medium">Tasks by Type</h2>
-                    <ResponsiveContainer width="100%" height={300}>
-                        <PieChart>
-                            <Pie
-                                data={typeData}
-                                dataKey="value"
-                                nameKey="name"
-                                cx="50%"
-                                cy="50%"
-                                outerRadius={100}
-                                label={({ name, value }) => `${name}: ${value}`}
-                            >
-                                {typeData.map((_, i) => (
-                                    <Cell key={i} fill={COLORS[i % COLORS.length]} />
-                                ))}
-                            </Pie>
-                        </PieChart>
-                    </ResponsiveContainer>
-                </div>
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Tasks by Type</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <ResponsiveContainer width="100%" height={300}>
+                            <PieChart>
+                                <Pie
+                                    data={typeData}
+                                    dataKey="value"
+                                    nameKey="name"
+                                    cx="50%"
+                                    cy="50%"
+                                    outerRadius={100}
+                                    label={({ name, value }) => `${name}: ${value}`}
+                                >
+                                    {typeData.map((_, i) => (
+                                        <Cell key={i} fill={COLORS[i % COLORS.length]} />
+                                    ))}
+                                </Pie>
+                            </PieChart>
+                        </ResponsiveContainer>
+                    </CardContent>
+                </Card>
             </div>
 
             {/* Priority Breakdown */}
-            <div className="not-dark:bg-white dark:bg-gradient-to-br dark:from-zinc-800/70 dark:to-zinc-900/50 border border-zinc-300 dark:border-zinc-800 rounded-lg p-6">
-                <h2 className="text-zinc-900 dark:text-white mb-4 font-medium">Tasks by Priority</h2>
-                <div className="space-y-4">
-                    {priorityData.map((p) => (
-                        <div key={p.name} className="space-y-2">
-                            <div className="flex justify-between items-center">
-                                <div className="flex items-center gap-2">
-                                    <ArrowRightIcon className={`size-3.5 ${PRIORITY_COLORS[p.name]} bg-transparent dark:bg-transparent`} />
-                                    <span className="text-zinc-900 dark:text-zinc-200 capitalize">{p.name.toLowerCase()}</span>
+            <Card>
+                <CardHeader>
+                    <CardTitle>Tasks by Priority</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <div className="space-y-4">
+                        {priorityData.map((p) => (
+                            <div key={p.name} className="space-y-2">
+                                <div className="flex justify-between items-center">
+                                    <div className="flex items-center gap-2">
+                                        <ArrowRightIcon className="size-3.5 text-muted-foreground" />
+                                        <span className="capitalize font-medium">{p.name.toLowerCase()}</span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-sm text-muted-foreground">{p.value} tasks</span>
+                                        <span className="px-2 py-0.5 border rounded text-xs text-muted-foreground">
+                                            {p.percentage}%
+                                        </span>
+                                    </div>
                                 </div>
-                                <div className="flex items-center gap-2">
-                                    <span className="text-zinc-600 dark:text-zinc-400 text-sm">{p.value} tasks</span>
-                                    <span className="px-2 py-0.5 border border-zinc-400 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 text-xs rounded">
-                                        {p.percentage}%
-                                    </span>
-                                </div>
+                                <Progress value={p.percentage} className="h-1.5" indicatorClassName={PRIORITY_COLORS[p.name]} />
                             </div>
-                            <div className="w-full bg-zinc-300 dark:bg-zinc-800 rounded-full h-1.5">
-                                <div
-                                    className={`h-1.5 rounded-full ${PRIORITY_COLORS[p.name]}`}
-                                    style={{ width: `${p.percentage}%` }}
-                                />
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            </div>
+                        ))}
+                    </div>
+                </CardContent>
+            </Card>
         </div>
     );
 };
