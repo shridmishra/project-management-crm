@@ -2,7 +2,6 @@ import { Check, ChevronDown, Plus } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { setCurrentWorkspace } from "../features/workspaceSlice";
 import { useRouter } from "next/navigation";
-import { dummyWorkspaces } from "../assets/assets";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -47,7 +46,7 @@ function WorkspaceDropdown() {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg" align="start" side="bottom" sideOffset={4}>
                     <DropdownMenuLabel className="text-xs text-muted-foreground">Workspaces</DropdownMenuLabel>
-                    {dummyWorkspaces.map((ws) => (
+                    {workspaces.map((ws: any) => (
                         <DropdownMenuItem key={ws.id} onClick={() => onSelectWorkspace(ws.id)} className="gap-2 p-2 cursor-pointer">
                             <Avatar className="h-6 w-6 rounded-md">
                                 <AvatarImage src={(ws.image_url as any)?.src || ws.image_url} alt={ws.name} />

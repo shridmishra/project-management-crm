@@ -8,8 +8,8 @@ import { format } from "date-fns";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
 import { useSearchParams } from "next/navigation";
+import Link from "next/link";
 import { CalendarIcon, MessageCircle } from "lucide-react";
-import { assets } from "@/assets/assets";
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
@@ -32,14 +32,23 @@ function TaskDetailsContent() {
     const { currentWorkspace } = useSelector((state: any) => state.workspace);
 
     const fetchComments = async () => {
-
+        if (!taskId) return;
+        try {
+            const response = await fetch(`/api/comments?taskId=${taskId}`);
+            if (response.ok) {
+                const data = await response.json();
+                setComments(data);
+            }
+        } catch (error) {
+            console.error("Failed to fetch comments:", error);
+        }
     };
 
     const fetchTaskDetails = async () => {
         setLoading(true);
         if (!projectId || !taskId) return;
 
-        const proj = currentWorkspace.projects.find((p: any) => p.id === projectId);
+        const proj = currentWorkspace?.projects.find((p: any) => p.id === projectId);
         if (!proj) return;
 
         const tsk = proj.tasks.find((t: any) => t.id === taskId);
@@ -54,21 +63,28 @@ function TaskDetailsContent() {
         if (!newComment.trim()) return;
 
         try {
-
             toast.loading("Adding comment...");
 
-            //  Simulate API call
-            await new Promise((resolve) => setTimeout(resolve, 2000));
+            const response = await fetch('/api/comments', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    taskId,
+                    userId: user.id,
+                    content: newComment,
+                }),
+            });
 
-            const dummyComment = { id: Date.now(), user: { id: 1, name: "User", image: assets.profile_img_a }, content: newComment, createdAt: new Date() };
+            if (!response.ok) throw new Error("Failed to add comment");
 
-            setComments((prev) => [...prev, dummyComment]);
+            const data = await response.json();
+            setComments((prev) => [...prev, data]);
             setNewComment("");
-            toast.dismissAll();
+            toast.dismiss();
             toast.success("Comment added.");
         } catch (error: any) {
-            toast.dismissAll();
-            toast.error(error?.response?.data?.message || error.message);
+            toast.dismiss();
+            toast.error(error?.message || "Failed to add comment");
             console.error(error);
         }
     };
@@ -185,7 +201,7 @@ function TaskDetailsContent() {
                     <Card>
                         <CardContent className="p-4">
                             <p className="text-xl font-medium mb-4">Project Details</p>
-                            <h2 className="flex items-center gap-2 font-medium"> <a href="{project.name}" className="underline">{project.name}</a></h2>
+                            <h2 className="flex items-center gap-2 font-medium"> <Link href={`/projectsDetail?id=${project.id}&tab=tasks`} className="underline">{project.name}</Link></h2>
                             <p className="text-xs mt-3 text-muted-foreground">Project Start Date: {format(new Date(project.start_date), "dd MMM yyyy")}</p>
                             <div className="flex flex-wrap gap-4 text-sm text-muted-foreground mt-3">
                                 <span>Status: {project.status}</span>

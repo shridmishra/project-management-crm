@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Outfit } from "next/font/google";
 import "./globals.css";
 import { Providers } from "../providers";
-import MainLayout from "@/components/MainLayout";
+
 
 const outfit = Outfit({
   subsets: ["latin"],
@@ -23,7 +23,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${outfit.className} antialiased`}>
         <Providers>
-          <MainLayout>{children}</MainLayout>
+          {children}
         </Providers>
       </body>
     </html>

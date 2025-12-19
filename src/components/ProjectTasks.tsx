@@ -5,7 +5,8 @@ import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
 import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { deleteTask, updateTask } from "../features/workspaceSlice";
+import { updateTaskAsync, deleteTaskAsync } from "../features/workspaceSlice";
+import type { AppDispatch } from "@/lib/store";
 import { Bug, CalendarIcon, GitCommit, MessageSquare, Square, Trash, XIcon, Zap } from "lucide-react";
 import {
     Table,
@@ -43,7 +44,7 @@ const priorityVariants = {
 };
 
 const ProjectTasks = ({ tasks }) => {
-    const dispatch = useDispatch();
+    const dispatch = useDispatch<AppDispatch>();
     const router = useRouter();
     const [selectedTasks, setSelectedTasks] = useState([]);
 
@@ -77,18 +78,21 @@ const ProjectTasks = ({ tasks }) => {
 
     const handleStatusChange = async (taskId, newStatus) => {
         try {
+            const task = tasks.find((t) => t.id === taskId);
+            if (!task) return;
+
             toast.loading("Updating status...");
-            await new Promise((resolve) => setTimeout(resolve, 2000));
+            await dispatch(updateTaskAsync({
+                id: taskId,
+                status: newStatus,
+                projectId: task.projectId,
+            })).unwrap();
 
-            let updatedTask = structuredClone(tasks.find((t) => t.id === taskId));
-            updatedTask.status = newStatus;
-            dispatch(updateTask(updatedTask));
-
-            toast.dismissAll();
+            toast.dismiss();
             toast.success("Task status updated successfully");
-        } catch (error) {
-            toast.dismissAll();
-            toast.error(error?.response?.data?.message || error.message);
+        } catch (error: any) {
+            toast.dismiss();
+            toast.error(error?.message || "Failed to update task");
         }
     };
 
@@ -98,16 +102,24 @@ const ProjectTasks = ({ tasks }) => {
             if (!confirm) return;
 
             toast.loading("Deleting tasks...");
-            await new Promise((resolve) => setTimeout(resolve, 2000));
 
-            dispatch(deleteTask(selectedTasks));
+            // Delete tasks one by one
+            for (const taskId of selectedTasks) {
+                const task = tasks.find((t) => t.id === taskId);
+                if (task) {
+                    await dispatch(deleteTaskAsync({
+                        taskId,
+                        projectId: task.projectId,
+                    })).unwrap();
+                }
+            }
 
-            toast.dismissAll();
+            toast.dismiss();
             toast.success("Tasks deleted successfully");
             setSelectedTasks([]);
-        } catch (error) {
-            toast.dismissAll();
-            toast.error(error?.response?.data?.message || error.message);
+        } catch (error: any) {
+            toast.dismiss();
+            toast.error(error?.message || "Failed to delete tasks");
         }
     };
 

@@ -1,29 +1,33 @@
 import { useState } from "react";
 import { XIcon } from "lucide-react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import toast from "react-hot-toast";
+import { createProjectAsync } from "@/features/workspaceSlice";
+import type { AppDispatch } from "@/lib/store";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
 } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
 
 const CreateProjectDialog = ({ isDialogOpen, setIsDialogOpen }) => {
 
+    const dispatch = useDispatch<AppDispatch>();
     const { currentWorkspace } = useSelector((state: any) => state.workspace);
 
     const [formData, setFormData] = useState({
@@ -42,7 +46,52 @@ const CreateProjectDialog = ({ isDialogOpen, setIsDialogOpen }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        
+        if (!currentWorkspace) return;
+
+        setIsSubmitting(true);
+        try {
+            // Find the team lead user id from email
+            const teamLeadMember = currentWorkspace.members?.find(
+                (m: any) => m.user.email === formData.team_lead
+            );
+            const teamLeadId = teamLeadMember?.user?.id || currentWorkspace.ownerId;
+
+            // Find member user ids from emails
+            const memberIds = formData.team_members.map((email: string) => {
+                const member = currentWorkspace.members?.find((m: any) => m.user.email === email);
+                return member?.user?.id;
+            }).filter(Boolean);
+
+            await dispatch(createProjectAsync({
+                name: formData.name,
+                description: formData.description,
+                status: formData.status,
+                priority: formData.priority,
+                startDate: formData.start_date || null,
+                endDate: formData.end_date || null,
+                teamLead: teamLeadId,
+                workspaceId: currentWorkspace.id,
+                memberIds: memberIds.length > 0 ? memberIds : [teamLeadId],
+            })).unwrap();
+
+            toast.success("Project created successfully!");
+            setFormData({
+                name: "",
+                description: "",
+                status: "PLANNING",
+                priority: "MEDIUM",
+                start_date: "",
+                end_date: "",
+                team_members: [],
+                team_lead: "",
+                progress: 0,
+            });
+            setIsDialogOpen(false);
+        } catch (error: any) {
+            toast.error(error.message || "Failed to create project");
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     const removeTeamMember = (email) => {
@@ -65,23 +114,23 @@ const CreateProjectDialog = ({ isDialogOpen, setIsDialogOpen }) => {
                     {/* Project Name */}
                     <div className="space-y-2">
                         <Label htmlFor="name">Project Name</Label>
-                        <Input 
-                            id="name" 
-                            value={formData.name} 
-                            onChange={(e) => setFormData({ ...formData, name: e.target.value })} 
-                            placeholder="Enter project name" 
-                            required 
+                        <Input
+                            id="name"
+                            value={formData.name}
+                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                            placeholder="Enter project name"
+                            required
                         />
                     </div>
 
                     {/* Description */}
                     <div className="space-y-2">
                         <Label htmlFor="description">Description</Label>
-                        <Textarea 
-                            id="description" 
-                            value={formData.description} 
-                            onChange={(e) => setFormData({ ...formData, description: e.target.value })} 
-                            placeholder="Describe your project" 
+                        <Textarea
+                            id="description"
+                            value={formData.description}
+                            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                            placeholder="Describe your project"
                             className="h-20"
                         />
                     </div>
@@ -90,8 +139,8 @@ const CreateProjectDialog = ({ isDialogOpen, setIsDialogOpen }) => {
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
                             <Label htmlFor="status">Status</Label>
-                            <Select 
-                                value={formData.status} 
+                            <Select
+                                value={formData.status}
                                 onValueChange={(value) => setFormData({ ...formData, status: value })}
                             >
                                 <SelectTrigger>
@@ -109,8 +158,8 @@ const CreateProjectDialog = ({ isDialogOpen, setIsDialogOpen }) => {
 
                         <div className="space-y-2">
                             <Label htmlFor="priority">Priority</Label>
-                            <Select 
-                                value={formData.priority} 
+                            <Select
+                                value={formData.priority}
                                 onValueChange={(value) => setFormData({ ...formData, priority: value })}
                             >
                                 <SelectTrigger>
@@ -129,20 +178,20 @@ const CreateProjectDialog = ({ isDialogOpen, setIsDialogOpen }) => {
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
                             <Label htmlFor="start_date">Start Date</Label>
-                            <Input 
-                                id="start_date" 
-                                type="date" 
-                                value={formData.start_date} 
-                                onChange={(e) => setFormData({ ...formData, start_date: e.target.value })} 
+                            <Input
+                                id="start_date"
+                                type="date"
+                                value={formData.start_date}
+                                onChange={(e) => setFormData({ ...formData, start_date: e.target.value })}
                             />
                         </div>
                         <div className="space-y-2">
                             <Label htmlFor="end_date">End Date</Label>
-                            <Input 
-                                id="end_date" 
-                                type="date" 
-                                value={formData.end_date} 
-                                onChange={(e) => setFormData({ ...formData, end_date: e.target.value })} 
+                            <Input
+                                id="end_date"
+                                type="date"
+                                value={formData.end_date}
+                                onChange={(e) => setFormData({ ...formData, end_date: e.target.value })}
                                 min={formData.start_date}
                             />
                         </div>
@@ -151,14 +200,14 @@ const CreateProjectDialog = ({ isDialogOpen, setIsDialogOpen }) => {
                     {/* Lead */}
                     <div className="space-y-2">
                         <Label htmlFor="team_lead">Project Lead</Label>
-                        <Select 
-                            value={formData.team_lead} 
+                        <Select
+                            value={formData.team_lead}
                             onValueChange={(value) => {
                                 const lead = value === "no-lead" ? "" : value;
-                                setFormData({ 
-                                    ...formData, 
-                                    team_lead: lead, 
-                                    team_members: lead ? [...new Set([...formData.team_members, lead])] : formData.team_members 
+                                setFormData({
+                                    ...formData,
+                                    team_lead: lead,
+                                    team_members: lead ? [...new Set([...formData.team_members, lead])] : formData.team_members
                                 });
                             }}
                         >
@@ -179,7 +228,7 @@ const CreateProjectDialog = ({ isDialogOpen, setIsDialogOpen }) => {
                     {/* Team Members */}
                     <div className="space-y-2">
                         <Label htmlFor="team_members">Team Members</Label>
-                        <Select 
+                        <Select
                             onValueChange={(value) => {
                                 if (value && !formData.team_members.includes(value)) {
                                     setFormData((prev) => ({ ...prev, team_members: [...prev.team_members, value] }));

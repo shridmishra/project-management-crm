@@ -1,8 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { format } from "date-fns";
+import toast from "react-hot-toast";
+import { createTaskAsync } from "@/features/workspaceSlice";
+import type { AppDispatch } from "@/lib/store";
 import {
     Dialog,
     DialogContent,
@@ -23,6 +26,7 @@ import {
 } from "@/components/ui/select"
 
 export default function CreateTaskDialog({ showCreateTask, setShowCreateTask, projectId }) {
+    const dispatch = useDispatch<AppDispatch>();
     const currentWorkspace = useSelector((state: any) => state.workspace?.currentWorkspace || null);
     const project = currentWorkspace?.projects.find((p) => p.id === projectId);
     const teamMembers = project?.members || [];
@@ -41,6 +45,40 @@ export default function CreateTaskDialog({ showCreateTask, setShowCreateTask, pr
     const handleSubmit = async (e) => {
         e.preventDefault();
 
+        if (!formData.title.trim()) {
+            toast.error("Title is required");
+            return;
+        }
+
+        setIsSubmitting(true);
+        try {
+            await dispatch(createTaskAsync({
+                projectId,
+                title: formData.title,
+                description: formData.description,
+                type: formData.type,
+                status: formData.status,
+                priority: formData.priority,
+                assigneeId: formData.assigneeId || teamMembers[0]?.user?.id,
+                dueDate: formData.due_date || null,
+            })).unwrap();
+
+            toast.success("Task created successfully!");
+            setFormData({
+                title: "",
+                description: "",
+                type: "TASK",
+                status: "TODO",
+                priority: "MEDIUM",
+                assigneeId: "",
+                due_date: "",
+            });
+            setShowCreateTask(false);
+        } catch (error: any) {
+            toast.error(error.message || "Failed to create task");
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     return (
