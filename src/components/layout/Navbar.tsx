@@ -1,7 +1,6 @@
 import { SearchIcon, MoonIcon, SunIcon } from 'lucide-react'
 import { useDispatch, useSelector } from 'react-redux'
-import { toggleTheme } from '../features/themeSlice'
-import { assets } from '../assets/assets'
+import { toggleTheme } from '@/features/theme/store/themeSlice'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -51,7 +50,7 @@ const Navbar = () => {
 
                     {/* User Avatar - Static for now */}
                     <Avatar className="cursor-pointer">
-                        <AvatarImage src={assets.profile_img_a.src} />
+                        <AvatarImage src="" />
                         <AvatarFallback>U</AvatarFallback>
                     </Avatar>
                 </div>

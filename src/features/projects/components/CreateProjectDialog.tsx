@@ -2,7 +2,7 @@ import { useState } from "react";
 import { XIcon } from "lucide-react";
 import { useSelector, useDispatch } from "react-redux";
 import toast from "react-hot-toast";
-import { createProjectAsync } from "@/features/workspaceSlice";
+import { createProjectAsync } from "@/features/workspaces/store/workspaceSlice";
 import type { AppDispatch } from "@/lib/store";
 import {
     Dialog,

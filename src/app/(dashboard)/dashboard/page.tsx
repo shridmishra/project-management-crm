@@ -3,11 +3,11 @@ export const dynamic = "force-dynamic";
 
 import { Plus } from 'lucide-react'
 import { useState, useEffect } from 'react'
-import StatsGrid from '@/components/StatsGrid'
-import ProjectOverview from '@/components/ProjectOverview'
-import RecentActivity from '@/components/RecentActivity'
-import TasksSummary from '@/components/TasksSummary'
-import CreateProjectDialog from '@/components/CreateProjectDialog'
+import StatsGrid from '@/features/analytics/components/StatsGrid'
+import ProjectOverview from '@/features/projects/components/ProjectOverview'
+import RecentActivity from '@/features/activity/components/RecentActivity'
+import TasksSummary from '@/features/tasks/components/TasksSummary'
+import CreateProjectDialog from '@/features/projects/components/CreateProjectDialog'
 import { Button } from "@/components/ui/button"
 
 const Dashboard = () => {

@@ -7,7 +7,7 @@ import { Suspense, useEffect, useState } from "react";
 import { format } from "date-fns";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useParams } from "next/navigation";
 import Link from "next/link";
 import { CalendarIcon, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button"
@@ -18,9 +18,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 
 function TaskDetailsContent() {
-    const searchParams = useSearchParams();
-    const projectId = searchParams.get("projectId");
-    const taskId = searchParams.get("taskId");
+    const params = useParams();
+    const taskId = params?.taskId as string;
 
     const user = { id: 'user_1' }
     const [task, setTask] = useState<any>(null);
@@ -46,16 +45,28 @@ function TaskDetailsContent() {
 
     const fetchTaskDetails = async () => {
         setLoading(true);
-        if (!projectId || !taskId) return;
+        if (!taskId) return;
 
-        const proj = currentWorkspace?.projects.find((p: any) => p.id === projectId);
-        if (!proj) return;
+        const projects = currentWorkspace?.projects || [];
+        let tsk = null;
+        let foundProj = null;
 
-        const tsk = proj.tasks.find((t: any) => t.id === taskId);
-        if (!tsk) return;
+        for (const p of projects) {
+            const t = p.tasks?.find((t: any) => t.id === taskId);
+            if (t) {
+                tsk = t;
+                foundProj = p;
+                break;
+            }
+        }
+
+        if (!tsk) {
+            setLoading(false);
+            return;
+        }
 
         setTask(tsk);
-        setProject(proj);
+        setProject(foundProj);
         setLoading(false);
     };
 
@@ -201,7 +212,7 @@ function TaskDetailsContent() {
                     <Card>
                         <CardContent className="p-4">
                             <p className="text-xl font-medium mb-4">Project Details</p>
-                            <h2 className="flex items-center gap-2 font-medium"> <Link href={`/projectsDetail?id=${project.id}&tab=tasks`} className="underline">{project.name}</Link></h2>
+                            <h2 className="flex items-center gap-2 font-medium"> <Link href={`/projects/${project.id}?tab=tasks`} className="underline">{project.name}</Link></h2>
                             <p className="text-xs mt-3 text-muted-foreground">Project Start Date: {format(new Date(project.start_date), "dd MMM yyyy")}</p>
                             <div className="flex flex-wrap gap-4 text-sm text-muted-foreground mt-3">
                                 <span>Status: {project.status}</span>

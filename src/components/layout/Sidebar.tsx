@@ -1,7 +1,7 @@
 import Link from "next/link";
-import MyTasksSidebar from './MyTasksSidebar'
-import ProjectSidebar from './ProjectsSidebar'
-import WorkspaceDropdown from './WorkspaceDropdown'
+import MyTasksSidebar from '@/features/tasks/components/MyTasksSidebar'
+import ProjectSidebar from '@/features/projects/components/ProjectsSidebar'
+import WorkspaceDropdown from '@/features/workspaces/components/WorkspaceDropdown'
 import { FolderOpenIcon, LayoutDashboardIcon, SettingsIcon, UsersIcon } from 'lucide-react'
 import {
     Sidebar,

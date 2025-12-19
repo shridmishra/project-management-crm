@@ -4,8 +4,8 @@ export const dynamic = "force-dynamic";
 import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { Plus, Search, FolderOpen } from "lucide-react";
-import ProjectCard from "@/components/ProjectCard";
-import CreateProjectDialog from "@/components/CreateProjectDialog";
+import ProjectCard from "@/features/projects/components/ProjectCard";
+import CreateProjectDialog from "@/features/projects/components/CreateProjectDialog";
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {

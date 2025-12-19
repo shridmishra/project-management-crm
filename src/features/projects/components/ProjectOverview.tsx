@@ -60,7 +60,7 @@ const ProjectOverview = () => {
                 ) : (
                     <div className="divide-y">
                         {projects.slice(0, 5).map((project) => (
-                            <Link key={project.id} href={`/projectsDetail?id=${project.id}&tab=tasks`} className="block p-6 hover:bg-accent/50 transition-colors">
+                            <Link key={project.id} href={`/projects/${project.id}?tab=tasks`} className="block p-6 hover:bg-accent/50 transition-colors">
                                 <div className="flex items-start justify-between mb-3">
                                     <div className="flex-1 mr-4">
                                         <h3 className="font-semibold mb-1">

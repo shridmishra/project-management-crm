@@ -5,7 +5,7 @@ import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
 import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { updateTaskAsync, deleteTaskAsync } from "../features/workspaceSlice";
+import { updateTaskAsync, deleteTaskAsync } from "@/features/workspaces/store/workspaceSlice";
 import type { AppDispatch } from "@/lib/store";
 import { Bug, CalendarIcon, GitCommit, MessageSquare, Square, Trash, XIcon, Zap } from "lucide-react";
 import {
@@ -236,7 +236,7 @@ const ProjectTasks = ({ tasks }) => {
                                         <TableRow
                                             key={task.id}
                                             className="cursor-pointer hover:bg-muted/50"
-                                            onClick={() => router.push(`/taskDetails?projectId=${task.projectId}&taskId=${task.id}`)}
+                                            onClick={() => router.push(`/tasks/${task.id}`)}
                                         >
                                             <TableCell onClick={(e) => e.stopPropagation()}>
                                                 <Checkbox

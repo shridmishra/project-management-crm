@@ -23,7 +23,7 @@ const getStatusClass = (status: any) => {
 
 const ProjectCard = ({ project }: any) => {
     return (
-        <Link href={`/projectsDetail?id=${project.id}&tab=tasks`} className="block h-full">
+        <Link href={`/projects/${project.id}?tab=tasks`} className="block h-full">
             <Card className="hover:bg-accent/50 transition-colors duration-200 h-full flex flex-col">
                 <CardHeader className="pb-3">
                     <div className="flex justify-between items-start gap-2">

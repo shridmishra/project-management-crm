@@ -22,10 +22,10 @@ const ProjectSidebar = () => {
     );
 
     const getProjectSubItems = (projectId: any) => [
-        { title: 'Tasks', icon: KanbanIcon, url: `/projectsDetail?id=${projectId}&tab=tasks` },
-        { title: 'Analytics', icon: ChartColumnIcon, url: `/projectsDetail?id=${projectId}&tab=analytics` },
-        { title: 'Calendar', icon: CalendarIcon, url: `/projectsDetail?id=${projectId}&tab=calendar` },
-        { title: 'Settings', icon: SettingsIcon, url: `/projectsDetail?id=${projectId}&tab=settings` }
+        { title: 'Tasks', icon: KanbanIcon, url: `/projects/${projectId}?tab=tasks` },
+        { title: 'Analytics', icon: ChartColumnIcon, url: `/projects/${projectId}?tab=analytics` },
+        { title: 'Calendar', icon: CalendarIcon, url: `/projects/${projectId}?tab=calendar` },
+        { title: 'Settings', icon: SettingsIcon, url: `/projects/${projectId}?tab=settings` }
     ];
 
     const toggleProject = (id: any) => {
@@ -64,8 +64,7 @@ const ProjectSidebar = () => {
                         <CollapsibleContent className="ml-5 mt-1 space-y-1">
                             {getProjectSubItems(project.id).map((subItem: any) => {
                                 const isActive =
-                                    pathname === `/projectsDetail` &&
-                                    searchParams.get('id') === project.id &&
+                                    pathname === `/projects/${project.id}` &&
                                     searchParams.get('tab') === subItem.title.toLowerCase();
 
                                 return (

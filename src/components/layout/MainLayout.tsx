@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { SidebarProvider } from "@/components/ui/sidebar";
-import Sidebar from "@/components/Sidebar";
-import Navbar from "@/components/Navbar";
+import Sidebar from "@/components/layout/Sidebar";
+import Navbar from "@/components/layout/Navbar";
 import { useSelector } from "react-redux";
 import { Loader2Icon } from "lucide-react";
 

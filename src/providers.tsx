@@ -4,7 +4,7 @@ import { Provider } from 'react-redux';
 import { store } from '@/lib/store';
 import { Toaster } from 'react-hot-toast';
 import { useEffect } from 'react';
-import { fetchWorkspaces } from '@/features/workspaceSlice';
+import { fetchWorkspaces } from '@/features/workspaces/store/workspaceSlice';
 
 function DataLoader({ children }: { children: React.ReactNode }) {
     useEffect(() => {

@@ -74,7 +74,7 @@ function MyTasksSidebar() {
                     </div>
                 ) : (
                     myTasks.map((task: any, index: number) => (
-                        <Link key={index} href={`/taskDetails?projectId=${task.projectId}&taskId=${task.id}`} className="block">
+                        <Link key={index} href={`/tasks/${task.id}`} className="block">
                             <Button variant="ghost" className="w-full justify-start h-auto py-2 px-3 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">
                                 <div className="flex items-center gap-2 w-full min-w-0 text-left">
                                     <div className={`w-2 h-2 rounded-full ${getTaskStatusColor(task.status)} flex-shrink-0`} />

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { format } from "date-fns";
 import toast from "react-hot-toast";
-import { createTaskAsync } from "@/features/workspaceSlice";
+import { createTaskAsync } from "@/features/workspaces/store/workspaceSlice";
 import type { AppDispatch } from "@/lib/store";
 import {
     Dialog,

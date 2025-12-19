@@ -5,13 +5,13 @@ export const dynamic = "force-dynamic";
 
 import { Suspense, useState, useEffect } from "react";
 import { useSelector } from "react-redux";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams, useParams } from "next/navigation";
 import { ArrowLeftIcon, PlusIcon, SettingsIcon, BarChart3Icon, CalendarIcon, FileStackIcon, ZapIcon } from "lucide-react";
-import ProjectAnalytics from "@/components/ProjectAnalytics";
-import ProjectSettings from "@/components/ProjectSettings";
-import CreateTaskDialog from "@/components/CreateTaskDialog";
-import ProjectCalendar from "@/components/ProjectCalendar";
-import ProjectTasks from "@/components/ProjectTasks";
+import ProjectAnalytics from "@/features/analytics/components/ProjectAnalytics";
+import ProjectSettings from "@/features/projects/components/ProjectSettings";
+import CreateTaskDialog from "@/features/tasks/components/CreateTaskDialog";
+import ProjectCalendar from "@/features/projects/components/ProjectCalendar";
+import ProjectTasks from "@/features/tasks/components/ProjectTasks";
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent } from "@/components/ui/card"
@@ -20,9 +20,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 function ProjectDetailContent() {
     const searchParams = useSearchParams();
     const router = useRouter();
+    const params = useParams();
 
     const tab = searchParams.get('tab');
-    const id = searchParams.get('id');
+    const id = params?.projectId as string;
 
     const projects = useSelector((state: any) => state?.workspace?.currentWorkspace?.projects || []);
 
@@ -60,7 +61,7 @@ function ProjectDetailContent() {
         setActiveTab(val);
         // We need to keep the ID in the URL
         if (id) {
-            router.push(`/projectsDetail?id=${id}&tab=${val}`);
+            router.push(`/projects/${id}?tab=${val}`);
         }
     };
 

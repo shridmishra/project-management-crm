@@ -1,6 +1,6 @@
 import { Check, ChevronDown, Plus } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
-import { setCurrentWorkspace } from "../features/workspaceSlice";
+import { setCurrentWorkspace } from "@/features/workspaces/store/workspaceSlice";
 import { useRouter } from "next/navigation";
 import {
     DropdownMenu,
