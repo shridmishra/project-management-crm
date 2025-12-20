@@ -10,10 +10,13 @@ import {
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 
+import { useSession } from "@/lib/auth-client";
+
 export default function TasksSummary() {
 
     const { currentWorkspace } = useSelector((state: any) => state.workspace);
-    const user = { id: 'user_1' }
+    const { data: session } = useSession();
+    const user = session?.user;
     const [tasks, setTasks] = useState([]);
 
     // Get all tasks for all projects in current workspace
@@ -23,7 +26,7 @@ export default function TasksSummary() {
         }
     }, [currentWorkspace]);
 
-    const myTasks = tasks.filter(i => i.assigneeId === user.id);
+    const myTasks = user ? tasks.filter(i => i.assigneeId === user.id) : [];
     const overdueTasks = tasks.filter(t => t.due_date && new Date(t.due_date) < new Date() && t.status !== 'DONE');
     const inProgressIssues = tasks.filter(i => i.status === 'IN_PROGRESS');
 

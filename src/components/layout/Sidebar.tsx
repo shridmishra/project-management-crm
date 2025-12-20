@@ -18,7 +18,7 @@ import {
 
 const AppSidebar = () => {
     const menuItems = [
-        { name: 'Dashboard', href: '/', icon: LayoutDashboardIcon },
+        { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboardIcon },
         { name: 'Projects', href: '/projects', icon: FolderOpenIcon },
         { name: 'Team', href: '/team', icon: UsersIcon },
     ]
@@ -45,10 +45,10 @@ const AppSidebar = () => {
                             ))}
                             <SidebarMenuItem>
                                 <SidebarMenuButton asChild>
-                                    <button>
+                                    <Link href="/settings">
                                         <SettingsIcon />
                                         <span>Settings</span>
-                                    </button>
+                                    </Link>
                                 </SidebarMenuButton>
                             </SidebarMenuItem>
                         </SidebarMenu>

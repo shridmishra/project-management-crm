@@ -13,6 +13,9 @@ import {
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
+import { useState } from "react";
+import CreateWorkspaceDialog from "./CreateWorkspaceDialog";
+
 function WorkspaceDropdown() {
 
     const { workspaces } = useSelector((state: any) => state.workspace);
@@ -20,6 +23,7 @@ function WorkspaceDropdown() {
 
     const dispatch = useDispatch();
     const router = useRouter();
+    const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
 
     const onSelectWorkspace = (organizationId: any) => {
         dispatch(setCurrentWorkspace(organizationId))
@@ -62,7 +66,7 @@ function WorkspaceDropdown() {
                         </DropdownMenuItem>
                     ))}
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem className="gap-2 p-2 cursor-pointer">
+                    <DropdownMenuItem className="gap-2 p-2 cursor-pointer" onClick={() => setIsCreateDialogOpen(true)}>
                         <div className="flex size-6 items-center justify-center rounded-md border bg-background">
                             <Plus className="size-4" />
                         </div>
@@ -70,6 +74,8 @@ function WorkspaceDropdown() {
                     </DropdownMenuItem>
                 </DropdownMenuContent>
             </DropdownMenu>
+
+            <CreateWorkspaceDialog isDialogOpen={isCreateDialogOpen} setIsDialogOpen={setIsCreateDialogOpen} />
         </div>
     );
 }

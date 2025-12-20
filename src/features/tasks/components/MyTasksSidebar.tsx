@@ -10,9 +10,12 @@ import {
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 
+import { useSession } from '@/lib/auth-client';
+
 function MyTasksSidebar() {
 
-    const user = { id: 'user_1' }
+    const { data: session } = useSession();
+    const user = session?.user;
 
     const { currentWorkspace } = useSelector((state: any) => state.workspace);
     const [isOpen, setIsOpen] = useState(false);

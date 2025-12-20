@@ -1,37 +1,58 @@
 import { useState } from "react";
 import { Mail, UserPlus } from "lucide-react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { AppDispatch } from "@/lib/store";
+import { addMemberAsync } from "@/features/workspaces/store/workspaceSlice";
+import toast from "react-hot-toast";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
 } from "@/components/ui/select"
 
 const InviteMemberDialog = ({ isDialogOpen, setIsDialogOpen }) => {
 
     const currentWorkspace = useSelector((state: any) => state.workspace?.currentWorkspace || null);
+    const dispatch = useDispatch<AppDispatch>();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [formData, setFormData] = useState({
         email: "",
         role: "org:member",
     });
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        
+        if (!currentWorkspace) return;
+
+        setIsSubmitting(true);
+        try {
+            await dispatch(addMemberAsync({
+                workspaceId: currentWorkspace.id,
+                email: formData.email,
+                role: formData.role
+            })).unwrap();
+
+            toast.success("Member added successfully!");
+            setFormData({ email: "", role: "org:member" });
+            setIsDialogOpen(false);
+        } catch (error: any) {
+            toast.error(error.message || "Failed to add member");
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     return (
@@ -54,14 +75,14 @@ const InviteMemberDialog = ({ isDialogOpen, setIsDialogOpen }) => {
                         <Label htmlFor="email">Email Address</Label>
                         <div className="relative">
                             <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4" />
-                            <Input 
-                                id="email" 
-                                type="email" 
-                                value={formData.email} 
-                                onChange={(e) => setFormData({ ...formData, email: e.target.value })} 
-                                placeholder="Enter email address" 
-                                className="pl-9" 
-                                required 
+                            <Input
+                                id="email"
+                                type="email"
+                                value={formData.email}
+                                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                                placeholder="Enter email address"
+                                className="pl-9"
+                                required
                             />
                         </div>
                     </div>
@@ -69,8 +90,8 @@ const InviteMemberDialog = ({ isDialogOpen, setIsDialogOpen }) => {
                     {/* Role */}
                     <div className="space-y-2">
                         <Label htmlFor="role">Role</Label>
-                        <Select 
-                            value={formData.role} 
+                        <Select
+                            value={formData.role}
                             onValueChange={(value) => setFormData({ ...formData, role: value })}
                         >
                             <SelectTrigger>

@@ -16,10 +16,12 @@ import {
     SelectValue,
 } from "@/components/ui/select"
 
+const EMPTY_PROJECTS: any[] = [];
+
 export default function Projects() {
 
     const projects = useSelector(
-        (state: any) => state?.workspace?.currentWorkspace?.projects || []
+        (state: any) => state?.workspace?.currentWorkspace?.projects || EMPTY_PROJECTS
     );
 
     const [filteredProjects, setFilteredProjects] = useState([]);

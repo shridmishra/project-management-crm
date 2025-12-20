@@ -36,6 +36,35 @@ export const createTaskAsync = createAsyncThunk(
     }
 );
 
+export const createWorkspaceAsync = createAsyncThunk(
+    "workspace/createWorkspace",
+    async (workspaceData: any) => {
+        const response = await fetch("/api/workspaces", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(workspaceData),
+        });
+        if (!response.ok) throw new Error("Failed to create workspace");
+        return response.json();
+    }
+);
+
+export const addMemberAsync = createAsyncThunk(
+    "workspace/addMember",
+    async ({ workspaceId, email, role }: { workspaceId: string, email: string, role: string }) => {
+        const response = await fetch(`/api/workspaces/${workspaceId}/members`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, role }),
+        });
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.error || "Failed to add member");
+        }
+        return response.json();
+    }
+);
+
 export const updateTaskAsync = createAsyncThunk(
     "workspace/updateTask",
     async ({ id, ...data }: any) => {
@@ -247,6 +276,23 @@ const workspaceSlice = createSlice({
                             ? { ...w, projects: [...w.projects, action.payload] }
                             : w
                     );
+                }
+            })
+            // Create workspace
+            .addCase(createWorkspaceAsync.fulfilled, (state, action) => {
+                state.workspaces.push(action.payload);
+                if (!state.currentWorkspace) {
+                    state.currentWorkspace = action.payload;
+                }
+            })
+            // Add member
+            .addCase(addMemberAsync.fulfilled, (state, action) => {
+                const updatedWorkspace = action.payload;
+                state.workspaces = state.workspaces.map((w) =>
+                    w.id === updatedWorkspace.id ? updatedWorkspace : w
+                );
+                if (state.currentWorkspace?.id === updatedWorkspace.id) {
+                    state.currentWorkspace = updatedWorkspace;
                 }
             })
             // Create task

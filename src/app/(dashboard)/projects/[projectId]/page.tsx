@@ -12,6 +12,8 @@ import ProjectSettings from "@/features/projects/components/ProjectSettings";
 import CreateTaskDialog from "@/features/tasks/components/CreateTaskDialog";
 import ProjectCalendar from "@/features/projects/components/ProjectCalendar";
 import ProjectTasks from "@/features/tasks/components/ProjectTasks";
+import KanbanBoard from "@/features/tasks/components/KanbanBoard";
+import { LayoutListIcon, LayoutGridIcon } from "lucide-react";
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent } from "@/components/ui/card"
@@ -31,6 +33,7 @@ function ProjectDetailContent() {
     const [tasks, setTasks] = useState<any[]>([]);
     const [showCreateTask, setShowCreateTask] = useState(false);
     const [activeTab, setActiveTab] = useState(tab || "tasks");
+    const [view, setView] = useState<"list" | "kanban">("list");
 
     useEffect(() => {
         if (tab) setActiveTab(tab);
@@ -136,7 +139,30 @@ function ProjectDetailContent() {
 
                 <div className="mt-6">
                     <TabsContent value="tasks">
-                        <ProjectTasks tasks={tasks} />
+                        <div className="flex justify-end mb-4 gap-2">
+                            <Button
+                                variant={view === 'list' ? 'default' : 'outline'}
+                                size="sm"
+                                onClick={() => setView('list')}
+                                className="h-8 px-3"
+                            >
+                                <LayoutListIcon className="h-4 w-4 mr-2" /> List
+                            </Button>
+                            <Button
+                                variant={view === 'kanban' ? 'default' : 'outline'}
+                                size="sm"
+                                onClick={() => setView('kanban')}
+                                className="h-8 px-3"
+                            >
+                                <LayoutGridIcon className="h-4 w-4 mr-2" /> Kanban
+                            </Button>
+                        </div>
+
+                        {view === 'list' ? (
+                            <ProjectTasks tasks={tasks} />
+                        ) : (
+                            <KanbanBoard tasks={tasks} />
+                        )}
                     </TabsContent>
                     <TabsContent value="analytics">
                         <ProjectAnalytics tasks={tasks} project={project} />

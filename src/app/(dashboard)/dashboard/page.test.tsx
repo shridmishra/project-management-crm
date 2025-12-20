@@ -12,7 +12,7 @@ jest.mock('@/features/activity/components/RecentActivity', () => () => <div data
 jest.mock('@/features/tasks/components/TasksSummary', () => () => <div data-testid="tasks-summary">TasksSummary</div>)
 jest.mock('@/features/projects/components/CreateProjectDialog', () => () => <div data-testid="create-project-dialog">CreateProjectDialog</div>)
 
-// Create a render helper with Redux
+// Create a render helper with Redux 
 const renderWithRedux = (
     component: React.ReactElement,
     {

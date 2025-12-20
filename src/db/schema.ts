@@ -7,6 +7,7 @@ export const taskStatusEnum = pgEnum('task_status', ['TODO', 'IN_PROGRESS', 'DON
 export const taskTypeEnum = pgEnum('task_type', ['TASK', 'BUG', 'FEATURE', 'IMPROVEMENT', 'OTHER']);
 export const projectStatusEnum = pgEnum('project_status', ['ACTIVE', 'PLANNING', 'COMPLETED', 'ON_HOLD', 'CANCELLED']);
 export const priorityEnum = pgEnum('priority', ['LOW', 'MEDIUM', 'HIGH']);
+export const notificationTypeEnum = pgEnum('notification_type', ['TASK_ASSIGNED', 'TASK_UPDATED', 'COMMENT_ADDED', 'PROJECT_INVITE']);
 
 // Users table
 export const users = pgTable('users', {
@@ -131,6 +132,29 @@ export const comments = pgTable('comments', {
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
+// Attachments table
+export const attachments = pgTable('attachments', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  taskId: uuid('task_id').notNull().references(() => tasks.id, { onDelete: 'cascade' }),
+  userId: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  fileName: text('file_name').notNull(),
+  fileUrl: text('file_url').notNull(),
+  fileType: text('file_type'),
+  fileSize: integer('file_size'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
+// Notifications table
+export const notifications = pgTable('notifications', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  userId: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  type: notificationTypeEnum('type').notNull(),
+  message: text('message').notNull(),
+  data: json('data').default({}),
+  read: booleanType('read').default(false).notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
 // Relations
 export const usersRelations = relations(users, ({ many }) => ({
   workspaces: many(workspaceMembers),
@@ -139,6 +163,8 @@ export const usersRelations = relations(users, ({ many }) => ({
   comments: many(comments),
   projects: many(projects),
   projectMembers: many(projectMembers),
+  notifications: many(notifications),
+  attachments: many(attachments),
 }));
 
 export const workspacesRelations = relations(workspaces, ({ one, many }) => ({
@@ -195,6 +221,25 @@ export const tasksRelations = relations(tasks, ({ one, many }) => ({
     references: [users.id],
   }),
   comments: many(comments),
+  attachments: many(attachments),
+}));
+
+export const attachmentsRelations = relations(attachments, ({ one }) => ({
+  task: one(tasks, {
+    fields: [attachments.taskId],
+    references: [tasks.id],
+  }),
+  user: one(users, {
+    fields: [attachments.userId],
+    references: [users.id],
+  }),
+}));
+
+export const notificationsRelations = relations(notifications, ({ one }) => ({
+  user: one(users, {
+    fields: [notifications.userId],
+    references: [users.id],
+  }),
 }));
 
 export const commentsRelations = relations(comments, ({ one }) => ({

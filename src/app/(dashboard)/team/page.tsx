@@ -3,7 +3,7 @@ export const dynamic = "force-dynamic";
 
 import { useEffect, useState } from "react";
 import { UsersIcon, Search, UserPlus, Shield, Activity } from "lucide-react";
-import InviteMemberDialog from "@/components/InviteMemberDialog";
+import InviteMemberDialog from "@/features/workspaces/components/InviteMemberDialog";
 import { useSelector } from "react-redux";
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"

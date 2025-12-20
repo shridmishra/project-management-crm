@@ -16,12 +16,27 @@ import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
+import { useSession } from "@/lib/auth-client";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select"
+import { useDispatch } from "react-redux";
+import { updateTaskAsync } from "@/features/workspaces/store/workspaceSlice";
+import { AppDispatch } from "@/lib/store";
+import TaskAttachments from "@/features/tasks/components/TaskAttachments";
 
 function TaskDetailsContent() {
     const params = useParams();
     const taskId = params?.taskId as string;
+    const dispatch = useDispatch<AppDispatch>();
 
-    const user = { id: 'user_1' }
+    const { data: session } = useSession();
+    const user = session?.user;
+
     const [task, setTask] = useState<any>(null);
     const [project, setProject] = useState<any>(null);
     const [comments, setComments] = useState<any[]>([]);
@@ -70,6 +85,19 @@ function TaskDetailsContent() {
         setLoading(false);
     };
 
+    const handleUpdateTask = async (data: any) => {
+        try {
+            toast.loading("Updating task...");
+            await dispatch(updateTaskAsync({ id: taskId, projectId: task.projectId, ...data })).unwrap();
+            setTask((prev: any) => ({ ...prev, ...data }));
+            toast.dismiss();
+            toast.success("Task updated.");
+        } catch (error: any) {
+            toast.dismiss();
+            toast.error(error?.message || "Failed to update task");
+        }
+    };
+
     const handleAddComment = async () => {
         if (!newComment.trim()) return;
 
@@ -81,7 +109,7 @@ function TaskDetailsContent() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     taskId,
-                    userId: user.id,
+                    userId: user?.id,
                     content: newComment,
                 }),
             });
@@ -128,18 +156,18 @@ function TaskDetailsContent() {
                             {comments.length > 0 ? (
                                 <div className="flex flex-col gap-4 mb-6">
                                     {comments.map((comment) => (
-                                        <div key={comment.id} className={`max-w-[85%] p-3 rounded-md border ${comment.user.id === user?.id ? "ml-auto bg-primary/10 border-primary/20" : "mr-auto bg-muted/50 border-border"}`} >
-                                            <div className="flex items-center gap-2 mb-1 text-sm text-muted-foreground">
-                                                <Avatar className="h-5 w-5">
+                                        <div key={comment.id} className={`max-w-[90%] p-4 rounded-xl border ${comment.user.id === user?.id ? "ml-auto bg-primary/5 border-primary/20" : "mr-auto bg-card border-border shadow-sm"}`} >
+                                            <div className="flex items-center gap-2 mb-2 text-xs text-muted-foreground">
+                                                <Avatar className="h-6 w-6 border">
                                                     <AvatarImage src={comment.user.image} />
                                                     <AvatarFallback>{comment.user.name[0]}</AvatarFallback>
                                                 </Avatar>
-                                                <span className="font-medium text-foreground">{comment.user.name}</span>
-                                                <span className="text-xs">
-                                                    • {format(new Date(comment.createdAt), "dd MMM yyyy, HH:mm")}
+                                                <span className="font-semibold text-foreground">{comment.user.name}</span>
+                                                <span>
+                                                    {format(new Date(comment.createdAt), "dd MMM, HH:mm")}
                                                 </span>
                                             </div>
-                                            <p className="text-sm">{comment.content}</p>
+                                            <p className="text-sm leading-relaxed">{comment.content}</p>
                                         </div>
                                     ))}
                                 </div>
@@ -170,17 +198,33 @@ function TaskDetailsContent() {
                 {/* Task Info */}
                 <Card>
                     <CardContent className="p-5">
-                        <div className="mb-3">
-                            <h1 className="text-lg font-medium">{task.title}</h1>
-                            <div className="flex flex-wrap gap-2 mt-2">
-                                <Badge variant="secondary">
-                                    {task.status}
-                                </Badge>
-                                <Badge variant="outline">
+                        <div className="mb-4">
+                            <h1 className="text-xl font-bold mb-3">{task.title}</h1>
+                            <div className="flex flex-wrap gap-3">
+                                <Select value={task.status} onValueChange={(val) => handleUpdateTask({ status: val })}>
+                                    <SelectTrigger className="h-8 w-fit min-w-[110px] bg-muted/50">
+                                        <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="TODO">To Do</SelectItem>
+                                        <SelectItem value="IN_PROGRESS">In Progress</SelectItem>
+                                        <SelectItem value="DONE">Done</SelectItem>
+                                    </SelectContent>
+                                </Select>
+
+                                <Select value={task.priority} onValueChange={(val) => handleUpdateTask({ priority: val })}>
+                                    <SelectTrigger className={`h-8 w-fit min-w-[100px] bg-muted/50 ${task.priority === 'HIGH' ? 'text-destructive' : ''}`}>
+                                        <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="LOW">Low</SelectItem>
+                                        <SelectItem value="MEDIUM">Medium</SelectItem>
+                                        <SelectItem value="HIGH">High</SelectItem>
+                                    </SelectContent>
+                                </Select>
+
+                                <Badge variant="outline" className="h-8 px-3">
                                     {task.type}
-                                </Badge>
-                                <Badge variant={task.priority === 'HIGH' ? 'destructive' : task.priority === 'MEDIUM' ? 'default' : 'secondary'}>
-                                    {task.priority}
                                 </Badge>
                             </div>
                         </div>
@@ -191,19 +235,56 @@ function TaskDetailsContent() {
 
                         <Separator className="my-3" />
 
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
-                            <div className="flex items-center gap-2">
-                                <Avatar className="h-5 w-5">
-                                    <AvatarImage src={task.assignee?.image} />
-                                    <AvatarFallback>{task.assignee?.name?.[0]}</AvatarFallback>
-                                </Avatar>
-                                {task.assignee?.name || "Unassigned"}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm mt-4">
+                            <div className="space-y-1.5">
+                                <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Assignee</span>
+                                {project?.members ? (
+                                    <Select
+                                        value={task.assigneeId}
+                                        onValueChange={(val) => handleUpdateTask({ assigneeId: val })}
+                                    >
+                                        <SelectTrigger className="h-9 w-full bg-muted/30">
+                                            <SelectValue />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {project.members.map((m: any) => (
+                                                <SelectItem key={m.userId} value={m.userId}>
+                                                    <div className="flex items-center gap-2">
+                                                        <Avatar className="h-4 w-4">
+                                                            <AvatarImage src={m.user?.image} />
+                                                            <AvatarFallback>{m.user?.name?.[0]}</AvatarFallback>
+                                                        </Avatar>
+                                                        {m.user?.name}
+                                                    </div>
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                ) : (
+                                    <div className="flex items-center gap-2 h-9">
+                                        <Avatar className="h-5 w-5">
+                                            <AvatarImage src={task.assignee?.image} />
+                                            <AvatarFallback>{task.assignee?.name?.[0]}</AvatarFallback>
+                                        </Avatar>
+                                        {task.assignee?.name || "Unassigned"}
+                                    </div>
+                                )}
                             </div>
-                            <div className="flex items-center gap-2 text-muted-foreground">
-                                <CalendarIcon className="h-4 w-4" />
-                                Due : {format(new Date(task.due_date), "dd MMM yyyy")}
+                            <div className="space-y-1.5">
+                                <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Due Date</span>
+                                <div className="flex items-center gap-2 text-foreground h-9 bg-muted/30 px-3 rounded-md border border-input">
+                                    <CalendarIcon className="h-4 w-4 text-muted-foreground" />
+                                    {format(new Date(task.due_date), "dd MMM yyyy")}
+                                </div>
                             </div>
                         </div>
+                    </CardContent>
+                </Card>
+
+                {/* Attachments */}
+                <Card>
+                    <CardContent className="p-5">
+                        <TaskAttachments taskId={taskId} userId={user?.id || ""} />
                     </CardContent>
                 </Card>
 
