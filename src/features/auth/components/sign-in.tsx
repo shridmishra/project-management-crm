@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { toast } from "react-hot-toast"
 import Link from "next/link"
+import { FcGoogle } from "react-icons/fc"
 
 export function SignIn() {
     const [email, setEmail] = useState("")
@@ -65,13 +66,14 @@ export function SignIn() {
                     </div>
                 </div>
                 <Button variant="outline" type="button" className="w-full" onClick={handleGoogleSignIn}>
+                    <FcGoogle className="mr-2 h-5 w-5" />
                     Sign in with Google
                 </Button>
             </CardContent>
             <CardFooter>
-                <p className="text-center">
+                <p className="text-center text-sm text-muted-foreground w-full">
                     Don't have an account?{" "}
-                    <Link href="/sign-up" className="text-primary hover:underline">
+                    <Link href="/sign-up" className="font-medium text-primary hover:underline">
                         Sign up
                     </Link>
                 </p>

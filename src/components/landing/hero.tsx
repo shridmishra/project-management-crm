@@ -4,23 +4,27 @@ import React from "react";
 import { motion } from "motion/react";
 import { cn } from "@/lib/utils";
 import { SiZapier, SiWebflow, SiSlack, SiHubspot, SiFiverr } from "react-icons/si";
-import { ArrowRight, Search, Sun, Moon } from "lucide-react";
-import { useTheme } from "next-themes";
+import { ArrowRight, Sun, Moon } from "lucide-react";
 import Link from 'next/link';
+import { useSession } from "@/lib/auth-client";
+import { useDispatch, useSelector } from "react-redux";
+import { toggleTheme } from "@/features/theme/store/themeSlice";
 
 interface HeroProps {
     className?: string;
 }
 
 export const Hero = ({ className }: HeroProps) => {
-    const { resolvedTheme, setTheme } = useTheme();
+    const dispatch = useDispatch();
+    const { theme } = useSelector((state: any) => state.theme);
+    const { data: session } = useSession();
     const [mounted, setMounted] = React.useState(false);
 
     React.useEffect(() => {
         setMounted(true);
     }, []);
 
-    const isDark = mounted ? resolvedTheme === "dark" : true;
+    const isDark = theme === "dark";
 
     // Heights relative to the container, creating a V-shape
     const bars = [
@@ -57,34 +61,31 @@ export const Hero = ({ className }: HeroProps) => {
                         Topflow
                     </div>
 
-                    {/* Links */}
-                    <div className="hidden md:flex items-center gap-8 text-sm font-medium text-zinc-500 dark:text-zinc-400">
-                        <Link href="#" className="hover:text-zinc-900 dark:hover:text-white transition-colors">
-                            Features
-                        </Link>
-                        <Link href="#" className="hover:text-zinc-900 dark:hover:text-white transition-colors">
-                            About
-                        </Link>
-                        <Link href="#" className="hover:text-zinc-900 dark:hover:text-white transition-colors">
-                            Pricing
-                        </Link>
-                    </div>
-
                     {/* Auth */}
                     <div className="flex items-center gap-6 text-sm font-medium">
-                        <Link
-                            href="/dashboard"
-                            className="hidden md:block hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors"
-                        >
-                            Log in ↗
-                        </Link>
-                        <Link href="/dashboard">
-                            <button className="bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 text-white px-5 py-2 rounded-full transition-colors">
-                                Get started
-                            </button>
-                        </Link>
+                        {!session ? (
+                            <>
+                                <Link
+                                    href="/sign-in"
+                                    className="hidden md:block hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors"
+                                >
+                                    Log in
+                                </Link>
+                                <Link href="/sign-up">
+                                    <button className="bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 text-white px-5 py-2 rounded-full transition-colors">
+                                        Get started
+                                    </button>
+                                </Link>
+                            </>
+                        ) : (
+                            <Link href="/dashboard">
+                                <button className="bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 text-white px-5 py-2 rounded-full transition-colors">
+                                    Go to Dashboard
+                                </button>
+                            </Link>
+                        )}
                         <button
-                            onClick={() => setTheme(isDark ? "light" : "dark")}
+                            onClick={() => dispatch(toggleTheme())}
                             className="p-2 rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-900 dark:text-white transition-colors"
                         >
                             {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
@@ -114,22 +115,22 @@ export const Hero = ({ className }: HeroProps) => {
 
                 {/* Hero Content */}
                 <div className="relative z-10 flex flex-col items-center justify-center min-h-screen text-center px-4 pt-20">
-                    <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-8 max-w-5xl leading-tight">
-                        Manage projects with <br className="hidden md:block" /> the top 1% efficiency
+                    <h1 className="text-5xl md:text-7xl font-semibold tracking-tight mb-8 max-w-5xl leading-tight">
+                        Manage projects with <br className="hidden md:block" /> top
+                        <span className="bg-gradient-to-b from-pink-600 to-rose-400 bg-clip-text text-transparent">
+                            <span className="italic px-4" style={{ fontFamily: "'Instrument Serif', serif" }}>efficiency</span>
+                        </span>
                     </h1>
                     <p className="text-zinc-500 dark:text-zinc-400 text-lg md:text-xl max-w-2xl mb-12 leading-relaxed">
-                        Tell us your requirement and we&apos;ll match you with vetted Project Managers
-                        expert in less than <span className="text-zinc-900 dark:text-white font-semibold">48 hours</span>.
+                        Stop juggling multiple tools. Centralize your tasks, collaborate with your team in real-time, and hit your deadlines every time with our intuitive project management.
                     </p>
 
                     <div className="flex flex-col sm:flex-row items-center gap-6 mb-24">
-                        <Link href="/dashboard">
+                        <Link href={session ? "/dashboard" : "/sign-up"}>
                             <button
-                                className="flex items-center justify-start gap-3 bg-zinc-900 dark:bg-white text-white dark:text-black py-2 rounded-full font-medium hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-all hover:scale-105 active:scale-95"
-                                style={{ paddingLeft: '4px', paddingRight: '24px' }}
+                                className="flex items-center justify-start gap-3 bg-zinc-900 dark:bg-white text-white dark:text-black py-2 px-6 rounded-full font-medium hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-all hover:scale-105 active:scale-95"
                             >
-                                <div className="bg-white dark:bg-black rounded-full p-2"><Search className="w-4 h-4 text-black dark:text-white" /></div>
-                                Find talent
+                                Get Started
                             </button>
                         </Link>
                         <button className="flex items-center gap-2 text-zinc-900 dark:text-white font-medium hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors group">

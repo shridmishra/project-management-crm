@@ -5,10 +5,12 @@ import { store } from '@/lib/store';
 import { Toaster } from 'react-hot-toast';
 import { useEffect } from 'react';
 import { fetchWorkspaces } from '@/features/workspaces/store/workspaceSlice';
+import { loadTheme } from '@/features/theme/store/themeSlice';
 
 function DataLoader({ children }: { children: React.ReactNode }) {
     useEffect(() => {
         store.dispatch(fetchWorkspaces());
+        store.dispatch(loadTheme());
     }, []);
 
     return <>{children}</>;
