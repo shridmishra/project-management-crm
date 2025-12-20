@@ -5,7 +5,7 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import Sidebar from "@/components/layout/Sidebar";
 import Navbar from "@/components/layout/Navbar";
 import { useSelector } from "react-redux";
-import { Loader2Icon } from "lucide-react";
+import SkeletonLayout from "@/components/layout/SkeletonLayout";
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
     const [mounted, setMounted] = useState(false);
@@ -15,21 +15,12 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
         setMounted(true);
     }, []);
 
-    // Prevent SSR rendering of client-only components
     if (!mounted) {
-        return (
-            <div className='flex items-center justify-center h-screen bg-background'>
-                <Loader2Icon className="size-7 text-primary animate-spin" />
-            </div>
-        );
+        return <SkeletonLayout />;
     }
 
     if (loading) {
-        return (
-            <div className='flex items-center justify-center h-screen bg-background'>
-                <Loader2Icon className="size-7 text-primary animate-spin" />
-            </div>
-        );
+        return <SkeletonLayout />;
     }
 
     return (

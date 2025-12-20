@@ -14,9 +14,12 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
     SidebarRail,
+    SidebarTrigger,
+    useSidebar,
 } from "@/components/ui/sidebar"
 
 const AppSidebar = () => {
+    const { open } = useSidebar();
     const menuItems = [
         { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboardIcon },
         { name: 'Projects', href: '/projects', icon: FolderOpenIcon },
@@ -24,9 +27,12 @@ const AppSidebar = () => {
     ]
 
     return (
-        <Sidebar>
+        <Sidebar collapsible="icon">
             <SidebarHeader>
-                <WorkspaceDropdown />
+                <div className="flex items-center justify-between gap-2">
+                    <WorkspaceDropdown />
+                    {open && <SidebarTrigger />}
+                </div>
             </SidebarHeader>
             <SidebarContent>
                 <SidebarGroup>

@@ -10,6 +10,7 @@ import { useSelector } from "react-redux";
 import { useSearchParams, useParams } from "next/navigation";
 import Link from "next/link";
 import { CalendarIcon, MessageCircle } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
@@ -138,7 +139,42 @@ function TaskDetailsContent() {
         }
     }, [taskId, task]);
 
-    if (loading) return <div className="text-muted-foreground px-4 py-6">Loading task details...</div>;
+    if (loading) {
+        return (
+            <div className="flex flex-col-reverse lg:flex-row gap-6 sm:p-4 max-w-6xl mx-auto py-8 px-6">
+                <div className="w-full lg:w-2/3">
+                    <Card className="flex flex-col lg:h-[80vh]">
+                        <CardHeader>
+                            <Skeleton className="h-6 w-48" />
+                        </CardHeader>
+                        <CardContent className="flex-1 flex flex-col">
+                            <div className="space-y-4">
+                                <Skeleton className="h-24 w-full rounded-xl" />
+                                <Skeleton className="h-24 w-full rounded-xl" />
+                            </div>
+                        </CardContent>
+                    </Card>
+                </div>
+                <div className="w-full lg:w-1/2 flex flex-col gap-6">
+                    <Card>
+                        <CardContent className="p-5 space-y-4">
+                            <Skeleton className="h-8 w-3/4" />
+                            <div className="flex gap-3">
+                                <Skeleton className="h-8 w-24" />
+                                <Skeleton className="h-8 w-24" />
+                            </div>
+                            <Skeleton className="h-24 w-full" />
+                        </CardContent>
+                    </Card>
+                    <Card>
+                        <CardContent className="p-5">
+                            <Skeleton className="h-32 w-full" />
+                        </CardContent>
+                    </Card>
+                </div>
+            </div>
+        )
+    }
     if (!task) return <div className="text-destructive px-4 py-6">Task not found.</div>;
 
     return (

@@ -40,12 +40,25 @@ export function SignIn() {
     }
 
     return (
-        <Card className="w-full max-w-sm">
+        <Card className="w-full lg:min-w-sm">
             <CardHeader>
                 <CardTitle>Sign In</CardTitle>
                 <CardDescription>Welcome back! Please sign in to continue.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
+                <Button variant="outline" type="button" className="w-full" onClick={handleGoogleSignIn}>
+                    <FcGoogle className="mr-2 h-5 w-5" />
+                    Sign in with Google
+                </Button>
+
+                <div className="relative">
+                    <div className="absolute inset-0 flex items-center">
+                        <span className="w-full border-t" />
+                    </div>
+                    <div className="relative flex justify-center text-xs uppercase">
+                        <span className="bg-card px-2 text-muted-foreground">Or continue with</span>
+                    </div>
+                </div>
                 <div className="space-y-2">
                     <Label htmlFor="email">Email</Label>
                     <Input id="email" type="email" placeholder="m@example.com" value={email} onChange={(e) => setEmail(e.target.value)} />
@@ -56,18 +69,6 @@ export function SignIn() {
                 </div>
                 <Button className="w-full" onClick={handleSignIn} disabled={loading}>
                     {loading ? "Signing in..." : "Sign In"}
-                </Button>
-                <div className="relative">
-                    <div className="absolute inset-0 flex items-center">
-                        <span className="w-full border-t" />
-                    </div>
-                    <div className="relative flex justify-center text-xs uppercase">
-                        <span className="bg-background px-2 text-muted-foreground">Or continue with</span>
-                    </div>
-                </div>
-                <Button variant="outline" type="button" className="w-full" onClick={handleGoogleSignIn}>
-                    <FcGoogle className="mr-2 h-5 w-5" />
-                    Sign in with Google
                 </Button>
             </CardContent>
             <CardFooter>

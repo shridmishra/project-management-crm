@@ -4,7 +4,7 @@ import { toggleTheme } from '@/features/theme/store/themeSlice'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { SidebarTrigger } from "@/components/ui/sidebar"
+import { SidebarTrigger, useSidebar } from "@/components/ui/sidebar"
 import { useSession, signOut } from '@/lib/auth-client'
 import {
     DropdownMenu,
@@ -22,12 +22,13 @@ const Navbar = () => {
     const router = useRouter();
     const { theme } = useSelector((state: any) => state.theme);
     const { data: session } = useSession();
+    const { open, isMobile } = useSidebar();
 
     const handleSignOut = async () => {
         await signOut({
             fetchOptions: {
                 onSuccess: () => {
-                    router.push("/sign-in");
+                    router.push("/");
                 },
             },
         });
@@ -43,10 +44,10 @@ const Navbar = () => {
                 {/* Left section */}
                 <div className="flex items-center gap-4 min-w-0 flex-1">
                     {/* Sidebar Trigger */}
-                    <SidebarTrigger className="sm:hidden" />
+                    <SidebarTrigger className={open && !isMobile ? "hidden" : ""} />
 
                     {/* Search Input */}
-                    <div className="relative flex-1 max-w-sm">
+                    <div className="relative flex-1 max-w-sm hidden md:flex">
                         <SearchIcon className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground h-4 w-4" />
                         <Input
                             type="text"

@@ -11,6 +11,7 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
+import { SidebarMenuButton } from "@/components/ui/sidebar"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
 import { useState } from "react";
@@ -34,19 +35,20 @@ function WorkspaceDropdown() {
         <div>
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="w-full justify-between h-auto p-3 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">
-                        <div className="flex items-center gap-3 text-left">
-                            <Avatar className="h-8 w-8 rounded-md">
-                                <AvatarImage src={(currentWorkspace?.image_url as any)?.src || currentWorkspace?.image_url} alt={currentWorkspace?.name} />
-                                <AvatarFallback className="rounded-md">{currentWorkspace?.name?.[0]}</AvatarFallback>
-                            </Avatar>
-                            <div className="grid flex-1 text-left text-sm leading-tight">
-                                <span className="truncate font-semibold">{currentWorkspace?.name || "Select Workspace"}</span>
-                                <span className="truncate text-xs text-muted-foreground">{workspaces.length} workspace{workspaces.length !== 1 ? "s" : ""}</span>
-                            </div>
+                    <SidebarMenuButton
+                        size="lg"
+                        className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+                    >
+                        <Avatar className="h-8 w-8 rounded-lg">
+                            <AvatarImage src={(currentWorkspace?.image_url as any)?.src || currentWorkspace?.image_url} alt={currentWorkspace?.name} />
+                            <AvatarFallback className="rounded-lg">{currentWorkspace?.name?.[0]}</AvatarFallback>
+                        </Avatar>
+                        <div className="grid flex-1 text-left text-sm leading-tight">
+                            <span className="truncate font-semibold">{currentWorkspace?.name || "Select Workspace"}</span>
+                            <span className="truncate text-xs text-muted-foreground">{workspaces.length} workspace{workspaces.length !== 1 ? "s" : ""}</span>
                         </div>
-                        <ChevronDown className="ml-auto h-4 w-4 shrink-0 opacity-50" />
-                    </Button>
+                        <ChevronDown className="ml-auto size-4 group-data-[collapsible=icon]:!hidden" />
+                    </SidebarMenuButton>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg" align="start" side="bottom" sideOffset={4}>
                     <DropdownMenuLabel className="text-xs text-muted-foreground">Workspaces</DropdownMenuLabel>

@@ -1,12 +1,33 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/db';
 import { workspaces, workspaceMembers, projects, projectMembers, tasks, users } from '@/db/schema';
-import { eq } from 'drizzle-orm';
+import { eq, inArray } from 'drizzle-orm';
+import { auth } from '@/lib/auth';
+import { headers } from 'next/headers';
 
 // GET all workspaces with nested data
 export async function GET() {
   try {
+    const session = await auth.api.getSession({
+      headers: await headers()
+    });
+    if (!session?.user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const members = await db.query.workspaceMembers.findMany({
+      where: eq(workspaceMembers.userId, session.user.id),
+      columns: { workspaceId: true },
+    });
+
+    const workspaceIds = members.map(m => m.workspaceId);
+
+    if (workspaceIds.length === 0) {
+      return NextResponse.json([]);
+    }
+
     const allWorkspaces = await db.query.workspaces.findMany({
+      where: inArray(workspaces.id, workspaceIds),
       with: {
         owner: true,
         members: {

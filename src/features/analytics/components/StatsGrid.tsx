@@ -53,25 +53,26 @@ export default function StatsGrid() {
 
     useEffect(() => {
         if (currentWorkspace) {
+            const projects = currentWorkspace.projects || [];
             setStats({
-                totalProjects: currentWorkspace.projects.length,
-                activeProjects: currentWorkspace.projects.filter(
-                    (p) => p.status !== "CANCELLED" && p.status !== "COMPLETED"
+                totalProjects: projects.length,
+                activeProjects: projects.filter(
+                    (p: any) => p.status !== "CANCELLED" && p.status !== "COMPLETED"
                 ).length,
-                completedProjects: currentWorkspace.projects
-                    .filter((p) => p.status === "COMPLETED")
-                    .reduce((acc, project) => acc + project.tasks.length, 0),
-                myTasks: currentWorkspace.projects.reduce(
-                    (acc, project) =>
+                completedProjects: projects
+                    .filter((p: any) => p.status === "COMPLETED")
+                    .reduce((acc: number, project: any) => acc + (project.tasks?.length || 0), 0),
+                myTasks: projects.reduce(
+                    (acc: number, project: any) =>
                         acc +
-                        project.tasks.filter(
-                            (t) => t.assignee?.email === currentWorkspace.owner.email
-                        ).length,
+                        (project.tasks?.filter(
+                            (t: any) => t.assignee?.email === currentWorkspace.owner?.email
+                        ) || []).length,
                     0
                 ),
-                overdueIssues: currentWorkspace.projects.reduce(
-                    (acc, project) =>
-                        acc + project.tasks.filter((t) => t.due_date < new Date()).length,
+                overdueIssues: projects.reduce(
+                    (acc: number, project: any) =>
+                        acc + (project.tasks?.filter((t: any) => t.due_date && new Date(t.due_date) < new Date()).length || 0),
                     0
                 ),
             });

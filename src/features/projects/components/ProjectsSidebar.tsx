@@ -4,12 +4,22 @@ import { usePathname, useSearchParams } from 'next/navigation';
 import { ChevronRightIcon, SettingsIcon, KanbanIcon, ChartColumnIcon, CalendarIcon, ArrowRightIcon } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import {
+    SidebarGroup,
+    SidebarGroupLabel,
+    SidebarGroupAction,
+    SidebarGroupContent,
+    SidebarMenu,
+    SidebarMenuItem,
+    SidebarMenuButton,
+    SidebarMenuSub,
+    SidebarMenuSubItem,
+    SidebarMenuSubButton,
+} from "@/components/ui/sidebar"
+import {
     Collapsible,
     CollapsibleContent,
     CollapsibleTrigger,
 } from "@/components/ui/collapsible"
-import { Button } from "@/components/ui/button"
-import { cn } from "@/lib/utils"
 
 const ProjectSidebar = () => {
 
@@ -35,55 +45,57 @@ const ProjectSidebar = () => {
     };
 
     return (
-        <div className="mt-6 px-3">
-            <div className="flex items-center justify-between px-3 py-2">
-                <h3 className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                    Projects
-                </h3>
+        <SidebarGroup className="group-data-[collapsible=icon]:hidden">
+            <SidebarGroupLabel>Projects</SidebarGroupLabel>
+            <SidebarGroupAction title="View All" asChild>
                 <Link href="/projects">
-                    <Button variant="ghost" size="icon" className="h-5 w-5">
-                        <ArrowRightIcon className="h-3 w-3" />
-                    </Button>
+                    <ArrowRightIcon />
                 </Link>
-            </div>
+            </SidebarGroupAction>
+            <SidebarGroupContent>
+                <SidebarMenu>
+                    {projects.map((project: any) => (
+                        <Collapsible
+                            key={project.id}
+                            asChild
+                            open={expandedProjects.has(project.id)}
+                            onOpenChange={() => toggleProject(project.id)}
+                            className="group/collapsible"
+                        >
+                            <SidebarMenuItem>
+                                <CollapsibleTrigger asChild>
+                                    <SidebarMenuButton tooltip={project.name}>
+                                        <div className="flex size-2 shrink-0 rounded-full bg-primary" />
+                                        <span className="truncate group-data-[collapsible=icon]:!hidden">{project.name}</span>
+                                        <ChevronRightIcon className="ml-auto h-4 w-4 transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90 group-data-[collapsible=icon]:!hidden" />
+                                    </SidebarMenuButton>
+                                </CollapsibleTrigger>
+                                <CollapsibleContent>
+                                    <SidebarMenuSub>
+                                        {getProjectSubItems(project.id).map((subItem: any) => {
+                                            const isActive =
+                                                pathname === `/projects/${project.id}` &&
+                                                searchParams.get('tab') === subItem.title.toLowerCase();
 
-            <div className="space-y-1 px-3">
-                {projects.map((project: any) => (
-                    <Collapsible
-                        key={project.id}
-                        open={expandedProjects.has(project.id)}
-                        onOpenChange={() => toggleProject(project.id)}
-                    >
-                        <CollapsibleTrigger asChild>
-                            <Button variant="ghost" className="w-full justify-start h-auto py-2 px-3 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">
-                                <ChevronRightIcon className={cn("h-3 w-3 mr-2 transition-transform duration-200", expandedProjects.has(project.id) && 'rotate-90')} />
-                                <div className="h-2 w-2 rounded-full bg-primary mr-2" />
-                                <span className="truncate max-w-40 text-sm">{project.name}</span>
-                            </Button>
-                        </CollapsibleTrigger>
-                        <CollapsibleContent className="ml-5 mt-1 space-y-1">
-                            {getProjectSubItems(project.id).map((subItem: any) => {
-                                const isActive =
-                                    pathname === `/projects/${project.id}` &&
-                                    searchParams.get('tab') === subItem.title.toLowerCase();
-
-                                return (
-                                    <Link key={subItem.title} href={subItem.url} className={cn(
-                                        "flex items-center gap-3 px-3 py-1.5 rounded-lg transition-colors duration-200 text-xs",
-                                        isActive
-                                            ? 'bg-sidebar-accent text-sidebar-accent-foreground font-medium'
-                                            : 'text-muted-foreground hover:text-foreground hover:bg-sidebar-accent/50'
-                                    )} >
-                                        <subItem.icon className="h-3 w-3" />
-                                        {subItem.title}
-                                    </Link>
-                                );
-                            })}
-                        </CollapsibleContent>
-                    </Collapsible>
-                ))}
-            </div>
-        </div>
+                                            return (
+                                                <SidebarMenuSubItem key={subItem.title}>
+                                                    <SidebarMenuSubButton asChild isActive={isActive}>
+                                                        <Link href={subItem.url}>
+                                                            <subItem.icon />
+                                                            <span>{subItem.title}</span>
+                                                        </Link>
+                                                    </SidebarMenuSubButton>
+                                                </SidebarMenuSubItem>
+                                            );
+                                        })}
+                                    </SidebarMenuSub>
+                                </CollapsibleContent>
+                            </SidebarMenuItem>
+                        </Collapsible>
+                    ))}
+                </SidebarMenu>
+            </SidebarGroupContent>
+        </SidebarGroup>
     );
 };
 

@@ -14,6 +14,17 @@ jest.mock('@/lib/auth-client', () => ({
     }
 }))
 
+// Mock next/navigation
+jest.mock("next/navigation", () => ({
+    useRouter() {
+        return {
+            push: jest.fn(),
+            replace: jest.fn(),
+            prefetch: jest.fn(),
+        };
+    },
+}));
+
 describe('SignUp Page', () => {
     beforeEach(() => {
         jest.clearAllMocks()

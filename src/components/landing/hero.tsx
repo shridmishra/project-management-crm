@@ -52,9 +52,9 @@ export const Hero = ({ className }: HeroProps) => {
                 )}
             >
                 {/* Navbar */}
-                <nav className="absolute top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-6 max-w-7xl mx-auto w-full">
+                <nav className="absolute top-0 left-0 right-0 z-50 flex items-center justify-between px-4 py-4 md:px-6 md:py-6 max-w-7xl mx-auto w-full">
                     {/* Logo */}
-                    <div className="flex items-center gap-2 font-bold text-xl tracking-tight">
+                    <div className="flex items-center gap-2 font-bold text-lg md:text-xl tracking-tight">
                         <div className="w-6 h-6 bg-black dark:bg-white rounded-full flex items-center justify-center">
                             <div className="w-2 h-2 bg-white dark:bg-black rounded-full" />
                         </div>
@@ -62,7 +62,7 @@ export const Hero = ({ className }: HeroProps) => {
                     </div>
 
                     {/* Auth */}
-                    <div className="flex items-center gap-6 text-sm font-medium">
+                    <div className="flex items-center gap-4 md:gap-6 text-sm font-medium">
                         {!session ? (
                             <>
                                 <Link
@@ -72,15 +72,15 @@ export const Hero = ({ className }: HeroProps) => {
                                     Log in
                                 </Link>
                                 <Link href="/sign-up">
-                                    <button className="bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 text-white px-5 py-2 rounded-full transition-colors">
+                                    <button className="bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 text-white px-4 py-2 text-xs md:text-sm md:px-5 md:py-2 rounded-full transition-colors">
                                         Get started
                                     </button>
                                 </Link>
                             </>
                         ) : (
                             <Link href="/dashboard">
-                                <button className="bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 text-white px-5 py-2 rounded-full transition-colors">
-                                    Go to Dashboard
+                                <button className="bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 text-white px-4 py-2 text-xs md:text-sm md:px-5 md:py-2 rounded-full transition-colors">
+                                    Dashboard
                                 </button>
                             </Link>
                         )}
@@ -88,7 +88,7 @@ export const Hero = ({ className }: HeroProps) => {
                             onClick={() => dispatch(toggleTheme())}
                             className="p-2 rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-900 dark:text-white transition-colors"
                         >
-                            {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+                            {isDark ? <Sun className="w-4 h-4 md:w-5 md:h-5" /> : <Moon className="w-4 h-4 md:w-5 md:h-5" />}
                         </button>
                     </div>
                 </nav>
@@ -114,21 +114,21 @@ export const Hero = ({ className }: HeroProps) => {
                 <div className="absolute inset-0 bg-gradient-to-b from-white via-transparent to-white/60 dark:from-zinc-950 dark:via-transparent dark:to-zinc-950/30 pointer-events-none" />
 
                 {/* Hero Content */}
-                <div className="relative z-10 flex flex-col items-center justify-center min-h-screen text-center px-4 pt-20">
-                    <h1 className="text-5xl md:text-7xl font-semibold tracking-tight mb-8 max-w-5xl leading-tight">
+                <div className="relative z-10 flex flex-col items-center justify-center min-h-screen text-center px-4 pt-24 md:pt-20">
+                    <h1 className="text-4xl sm:text-5xl md:text-7xl font-semibold tracking-tight mb-6 md:mb-8 max-w-5xl leading-tight">
                         Manage projects with <br className="hidden md:block" /> top
                         <span className="bg-gradient-to-b from-pink-600 to-rose-400 bg-clip-text text-transparent">
-                            <span className="italic px-4" style={{ fontFamily: "'Instrument Serif', serif" }}>efficiency</span>
+                            <span className="italic px-2 md:px-4" style={{ fontFamily: "'Instrument Serif', serif" }}>efficiency</span>
                         </span>
                     </h1>
-                    <p className="text-zinc-500 dark:text-zinc-400 text-lg md:text-xl max-w-2xl mb-12 leading-relaxed">
+                    <p className="text-zinc-500 dark:text-zinc-400 text-base sm:text-lg md:text-xl max-w-2xl mb-8 md:mb-12 leading-relaxed">
                         Stop juggling multiple tools. Centralize your tasks, collaborate with your team in real-time, and hit your deadlines every time with our intuitive project management.
                     </p>
 
-                    <div className="flex flex-col sm:flex-row items-center gap-6 mb-24">
-                        <Link href={session ? "/dashboard" : "/sign-up"}>
+                    <div className="flex flex-col sm:flex-row items-center gap-4 md:gap-6 mb-16 md:mb-24 w-full sm:w-auto px-4 sm:px-0">
+                        <Link href={session ? "/dashboard" : "/sign-up"} className="w-full sm:w-auto">
                             <button
-                                className="flex items-center justify-start gap-3 bg-zinc-900 dark:bg-white text-white dark:text-black py-2 px-6 rounded-full font-medium hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-all hover:scale-105 active:scale-95"
+                                className="w-full sm:w-auto flex items-center justify-center gap-3 bg-zinc-900 dark:bg-white text-white dark:text-black py-3 px-6 md:py-2 md:px-6 rounded-full font-medium hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-all hover:scale-105 active:scale-95"
                             >
                                 Get Started
                             </button>
@@ -140,25 +140,25 @@ export const Hero = ({ className }: HeroProps) => {
                     </div>
 
                     {/* Trusted By */}
-                    <div className="flex flex-col items-center gap-8 w-full max-w-4xl mx-auto">
-                        <p className="text-zinc-500 dark:text-zinc-500 text-sm font-medium tracking-wide uppercase">
+                    <div className="flex flex-col items-center gap-6 md:gap-8 w-full max-w-4xl mx-auto px-4">
+                        <p className="text-zinc-500 dark:text-zinc-500 text-xs md:text-sm font-medium tracking-wide uppercase">
                             Trusted by <span className="text-zinc-900 dark:text-white/80">400+</span> companies
                         </p>
-                        <div className="flex flex-wrap justify-center items-center gap-8 md:gap-16 text-zinc-900 dark:text-white w-full">
-                            <div className="flex items-center gap-2 text-xl font-bold">
-                                <SiZapier className="w-6 h-6" /> _zapier
+                        <div className="flex flex-wrap justify-center items-center gap-6 md:gap-16 text-zinc-900 dark:text-white w-full">
+                            <div className="flex items-center gap-2 text-lg md:text-xl font-bold">
+                                <SiZapier className="w-5 h-5 md:w-6 md:h-6" /> _zapier
                             </div>
-                            <div className="flex items-center gap-2 text-xl font-bold">
-                                <SiWebflow className="w-6 h-6" /> Webflow
+                            <div className="flex items-center gap-2 text-lg md:text-xl font-bold">
+                                <SiWebflow className="w-5 h-5 md:w-6 md:h-6" /> Webflow
                             </div>
-                            <div className="flex items-center gap-2 text-xl font-bold">
-                                <SiSlack className="w-6 h-6" /> slack
+                            <div className="flex items-center gap-2 text-lg md:text-xl font-bold">
+                                <SiSlack className="w-5 h-5 md:w-6 md:h-6" /> slack
                             </div>
-                            <div className="flex items-center gap-2 text-xl font-bold">
-                                <SiHubspot className="w-6 h-6" /> HubSpot
+                            <div className="flex items-center gap-2 text-lg md:text-xl font-bold">
+                                <SiHubspot className="w-5 h-5 md:w-6 md:h-6" /> HubSpot
                             </div>
-                            <div className="flex items-center gap-2 text-xl font-bold">
-                                <SiFiverr className="w-14 h-14" />
+                            <div className="flex items-center gap-2 text-lg md:text-xl font-bold">
+                                <SiFiverr className="w-10 h-10 md:w-14 md:h-14" />
                             </div>
                         </div>
                     </div>

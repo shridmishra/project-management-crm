@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { FileIcon, PaperclipIcon, TrashIcon, XIcon, PlusIcon, FileTextIcon, ImageIcon, FileArchiveIcon } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -91,7 +92,20 @@ const TaskAttachments = ({ taskId, userId }: { taskId: string; userId: string })
         }
     };
 
-    if (loading) return <div className="text-sm text-muted-foreground animate-pulse">Loading attachments...</div>;
+    if (loading) {
+        return (
+            <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                    <Skeleton className="h-4 w-32" />
+                    <Skeleton className="h-8 w-16" />
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <Skeleton className="h-16 w-full rounded-lg" />
+                    <Skeleton className="h-16 w-full rounded-lg" />
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="space-y-4">

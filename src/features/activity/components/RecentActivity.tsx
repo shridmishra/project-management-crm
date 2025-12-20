@@ -3,10 +3,10 @@ import { GitCommit, MessageSquare, Clock, Bug, Zap, Square } from "lucide-react"
 import { format } from "date-fns";
 import { useSelector } from "react-redux";
 import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
+    Card,
+    CardContent,
+    CardHeader,
+    CardTitle,
 } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -34,7 +34,7 @@ const RecentActivity = () => {
 
     const getTasksFromCurrentWorkspace = () => {
         if (!currentWorkspace) return;
-        const tasks = currentWorkspace.projects.flatMap((project) => project.tasks.map((task) => task));
+        const tasks = currentWorkspace.projects?.flatMap((project) => project.tasks?.map((task) => task) || []) || [];
         setTasks(tasks);
     };
 

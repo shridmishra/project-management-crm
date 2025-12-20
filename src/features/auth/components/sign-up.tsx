@@ -7,9 +7,11 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { toast } from "react-hot-toast"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { FcGoogle } from "react-icons/fc"
 
 export function SignUp() {
+    const router = useRouter()
     const [name, setName] = useState("")
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
@@ -25,6 +27,7 @@ export function SignUp() {
         }, {
             onSuccess: () => {
                 toast.success("Account created!")
+                router.push("/dashboard")
             },
             onError: (ctx) => {
                 toast.error(ctx.error.message)
@@ -42,12 +45,25 @@ export function SignUp() {
     }
 
     return (
-        <Card className="w-full max-w-sm">
+        <Card className="w-full lg:min-w-sm">
             <CardHeader>
                 <CardTitle>Sign Up</CardTitle>
                 <CardDescription>Create your account to get started.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
+                <Button variant="outline" type="button" className="w-full" onClick={handleGoogleSignIn}>
+                    <FcGoogle className="mr-2 h-5 w-5" />
+                    Sign up with Google
+                </Button>
+                <div className="relative">
+                    <div className="absolute inset-0 flex items-center">
+                        <span className="w-full border-t" />
+                    </div>
+                    <div className="relative flex justify-center text-xs uppercase">
+                        <span className="bg-card px-2 text-muted-foreground">Or continue with</span>
+                    </div>
+                </div>
+
                 <div className="space-y-2">
                     <Label htmlFor="name">Name</Label>
                     <Input id="name" placeholder="John Doe" value={name} onChange={(e) => setName(e.target.value)} />
@@ -62,18 +78,6 @@ export function SignUp() {
                 </div>
                 <Button className="w-full" onClick={handleSignUp} disabled={loading}>
                     {loading ? "Creating account..." : "Sign Up"}
-                </Button>
-                <div className="relative">
-                    <div className="absolute inset-0 flex items-center">
-                        <span className="w-full border-t" />
-                    </div>
-                    <div className="relative flex justify-center text-xs uppercase">
-                        <span className="bg-background px-2 text-muted-foreground">Or continue with</span>
-                    </div>
-                </div>
-                <Button variant="outline" type="button" className="w-full" onClick={handleGoogleSignIn}>
-                    <FcGoogle className="mr-2 h-5 w-5" />
-                    Sign up with Google
                 </Button>
             </CardContent>
             <CardFooter>
