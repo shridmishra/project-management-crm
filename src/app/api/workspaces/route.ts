@@ -20,10 +20,12 @@ export async function GET() {
       columns: { workspaceId: true },
     });
 
-    const workspaceIds = members.map(m => m.workspaceId);
+    let workspaceIds = members.map(m => m.workspaceId);
 
     if (workspaceIds.length === 0) {
-      return NextResponse.json([]);
+      const { createTemplateWorkspace } = await import('@/lib/seed-workspace');
+      const templateWorkspace = await createTemplateWorkspace(session.user.id);
+      workspaceIds = [templateWorkspace.id];
     }
 
     const allWorkspaces = await db.query.workspaces.findMany({
